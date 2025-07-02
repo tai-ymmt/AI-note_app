@@ -1,1 +1,119 @@
-変更反映されてる？テスト
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ノート一覧</title>
+</head>
+<body style="margin: 0; padding: 0;">
+    <div style="max-width: 90%; margin: 0 auto; padding: 0 32px; box-sizing: border-box;">
+        <h1>ノート一覧</h1>
+        <!-- 検索フォーム -->
+        <form method="post" style="display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
+            <!-- 検索入力欄 -->
+            <input type="text" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）"
+                style="width: 30%; min-width: 150px; max-width: 50%; font-size: 1.2em; padding-right: 2em;"
+                oninput="document.getElementById('clear-btn').style.display = this.value ? 'block' : 'none';">
+            <!-- 入力クリアボタン -->
+            <button type="button" id="clear-btn" onclick="document.getElementById('searchword').value=''; this.style.display='none';"
+                style="display: none; position: absolute; right: 68%; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 1.2em; cursor: pointer;">✕</button>
+            <!-- 検索ボタン -->
+            <button type="submit" style="font-size: 1.0em; margin-left: 1%;">🔍</button>
+            <!-- 並び順プルダウン -->
+            <select name="order" style="margin-left: 2%; font-size: 1.0em;">
+                <option value="new">新しい順</option>
+                <option value="old">古い順</option>
+            </select>
+            <!-- 右寄せ用スペース -->
+            <span style="flex: 1;"></span>
+            <!-- 新規ノート作成ボタン -->
+            <button type="button" style="font-size: 1.0em; margin-right: 10%;">＋ 新規ノート</button>
+        </form>
+        <!-- ノート件数表示 -->
+        <p style="margin: 8px 0 0 0;">
+            {{ none }}件のノート
+        </p>
+        <!-- ノート一覧テーブル -->
+        <table style="border: none; margin-top: 24px; width: 100%; border-collapse: collapse;" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <!-- タイトル列 -->
+                    <th style="text-align: left;">タイトル</th>
+                    <!-- 最終更新日列 -->
+                    <th style="text-align: left;">最終更新日</th>
+                    <!-- 操作列 -->
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <!-- ノートタイトル -->
+                    <td style="text-align: left;">サンプルノート1</td>
+                    <!-- ノート最終更新日 -->
+                    <td style="text-align: left;">2025年07月02日</td>
+                    <!-- 削除ボタン -->
+                    <td style="text-align: center;">
+                        <button type="button" onclick="confirmDeleteCustom(function(){ /* ここに削除処理 */ });" style="font-size: 1.0em;">🗑️</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: left;">サンプルノート2</td>
+                    <td style="text-align: left;">2025年07月01日</td>
+                    <td style="text-align: center;">
+                        <button type="button" onclick="confirmDeleteCustom(function(){ /* ここに削除処理 */ });" style="font-size: 1.0em;">🗑️</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 削除確認モーダル -->
+    <div id="custom-modal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:32px 24px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2); min-width:260px; text-align:center;">
+            <!-- モーダルタイトル -->
+            <p style="margin-bottom: 24px; text-align: left;">ノートを削除しますか？</p>
+            <!-- モーダル説明 -->
+            <p style="margin-bottom: 32px; color:#666;">「{{none}}」を削除します。この操作は元に戻せません。</p>
+            <!-- キャンセルボタン -->
+            <button onclick="closeModal(false)" style="padding:8px 24px; background:#ccc; color:#333; border:none; border-radius:4px; font-size:1em; cursor:pointer;">キャンセル</button>
+            <!-- 削除ボタン -->
+            <button onclick="closeModal(true)" style="margin-right:16px; padding:8px 24px; background:#d32f2f; color:#fff; border:none; border-radius:4px; font-size:1em; cursor:pointer;">削除</button>
+        </div>
+    </div>
+
+    <!-- トースト通知 -->
+    <div id="toast" style="display:none; position:fixed; bottom:40px; left:50%; transform:translateX(-50%); background:#323232; color:#fff; padding:16px 32px; border-radius:8px; font-size:1.1em; z-index:2000; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+        削除しました
+    </div>
+
+    <script>
+    // 削除時のコールバックを保持
+    let deleteCallback = null;
+
+    // 削除確認モーダルを表示
+    function confirmDeleteCustom(callback) {
+        document.getElementById('custom-modal').style.display = 'flex';
+        deleteCallback = callback;
+    }
+
+    // モーダルを閉じる・削除処理実行
+    function closeModal(doDelete) {
+        document.getElementById('custom-modal').style.display = 'none';
+        if (doDelete && typeof deleteCallback === 'function') {
+            deleteCallback();
+            showToast('削除しました');
+        }
+        deleteCallback = null;
+    }
+
+    // トースト表示関数
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2000);
+    }
+    </script>
+</body>
+</html>
