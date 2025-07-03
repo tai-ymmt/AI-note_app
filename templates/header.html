@@ -15,10 +15,17 @@
                     </svg>
                 </a>
             </div>
-            <div class="app-actions">
-                <a href="設定画面へのpath" class="setting-link">設定</a>
-            </div>
+            <a href="設定画面へのpath" class="setting-actions">
+                <span class="gear-icon">⚙️</span>
+                <span class="setting-link">設定</span>
+            </a>
         </div>
     </header>
+    <script>
+        if (window.location.pathname.includes("settings")) {
+        document.querySelector(".setting-actions").style.backgroundColor = "#ae3e89";
+        document.querySelector(".setting-link").style.color = "#fff";
+        }
+    </script>
 </body>
 </html>
