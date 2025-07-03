@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>ノート一覧</title>
+    <style>
+        #hyou:hover {
+            background-color: #f0f4ff;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body style="margin: 0; padding: 0;">
     <div style="max-width: 90%; margin: 0 auto; padding: 0 32px; box-sizing: border-box;">
@@ -14,14 +20,14 @@
                 style="width: 30%; min-width: 150px; max-width: 50%; font-size: 1.2em; padding-right: 2em;"
                 oninput="clearbutton()">
             <!-- 入力クリアボタン -->
-            <button type="button" id="clear-btn" onclick="document.getElementById('searchword').value=''; this.style.display='none';"
+            <button type="button" id="clear-btn" onclick="clearsearch()"
                 style="display: none; position: absolute; right: 68%; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 1.2em; cursor: pointer;">✕</button>
             <!-- 検索ボタン -->
             <button type="submit" style="font-size: 1.0em; margin-left: 1%;">🔍</button>
             <!-- 並び順プルダウン -->
-            <select name="order" style="margin-left: 2%; font-size: 1.0em;">
-                {% for order in orders %}
-                 <option value="{{ order }}">{{ order }}</option>
+            <select name="order" style="margin-left: 2%; font-size: 1.0em;" onchange="this.form.submit()">
+                {% for o in orders %}
+                    <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
                 {% endfor %}
             </select>
             <!-- 右寄せ用スペース -->
@@ -47,14 +53,18 @@
                 </tr>
             </thead>
             <today>
-        {% for note in notes: %}
-            {% set column = note %}
-            <tr>
-                {% for item in column: %}
-                    <td style="text-align: left;">{{ item }}</td>
-                {% endfor %}
+            {% for note in notes: %}
+            <tr id="hyou" onclick="location.href='/note'">
+                    <td style="text-align: left;" >{{ note.title }}</td>
+                    <td style="text-align: left;">{{ note.date }}</td>
+                    <td style="text-align: center;">
+                        <!-- ノート一覧テーブル内の削除ボタン -->
+                        <button type="button"
+                            onclick="confirmDeleteCustom('{{ note.id }}', '{{ note.title|e }}')"
+                            style="font-size: 1.0em;">🗑️</button>
+                    </td>
             </tr>
-        {% endfor %}
+            {% endfor %}
             </today>
         </table>
         {% endif %}
@@ -70,7 +80,9 @@
             <!-- モーダルタイトル -->
             <p style="margin-bottom: 24px; text-align: left;">ノートを削除しますか？</p>
             <!-- モーダル説明 -->
-            <p style="margin-bottom: 32px; color:#666;">「{{none}}」を削除します。この操作は元に戻せません。</p>
+            <p style="margin-bottom: 32px; color:#666;">
+                「<span id="modal-note-title"></span>」を削除します。この操作は元に戻せません。
+            </p>
             <!-- キャンセルボタン -->
             <button onclick="closeModal(false)" style="padding:8px 24px; background:#ccc; color:#333; border:none; border-radius:4px; font-size:1em; cursor:pointer;">キャンセル</button>
             <!-- 削除ボタン -->
@@ -84,21 +96,33 @@
     </div>
 
     <script>
-
     function clearbutton(){
         const searchWord = document.getElementById('searchword').value;
         document.getElementById('clear-btn').style.display = searchWord ? 'block' : 'none';
     }
 
-
+    function clearsearch() {
+        document.getElementById('searchword').value = '';
+        clearbutton();
+        document.querySelector('form').submit(); //空にして送信
+    }
     
     // 削除時のコールバックを保持
     let deleteCallback = null;
 
     // 削除確認モーダルを表示
-    function confirmDeleteCustom(callback) {
+    function confirmDeleteCustom(id, title) {
         document.getElementById('custom-modal').style.display = 'flex';
-        deleteCallback = callback;
+        document.getElementById('modal-note-title').textContent = title;
+        deleteCallback = function() {
+            fetch('/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'id=' + encodeURIComponent(id)
+            }).then(() => {
+                location.reload();
+            });
+        };
     }
 
     // モーダルを閉じる・削除処理実行
@@ -121,6 +145,7 @@
         }, 2000);
     }
     clearbutton();
+    
     </script>
 </body>
 </html>

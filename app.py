@@ -1,25 +1,45 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
 orders = ["新しい順", "古い順"]
 notes = [
-    {"ノート1", "2000-01-01"},
-    {"ノート2", "2000-01-01"},
-    {"ノート3", "2000-01-01"}
+    {"id":1, "title": "ノート1",  "date": "2000-01-01", "content": "こんにちは"},
+    {"id":2, "title": "ノート2",  "date": "2000-01-02", "content": "こんばんは"},
+    {"id":3, "title": "ノート3",  "date": "2000-01-03", "content": "おはようございます"},
 ]
 print(len(notes))
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     searchword = ""
+    order = "新しい順"
+    filtered_notes = notes.copy()
     if request.method == "POST":
         searchword = request.form.get("searchword")
-    return render_template("index.html", searchword=searchword, orders=orders, notes=notes, len=len(notes))
+        order = request.form.get('order')
+    
+    if searchword:
+        filtered_notes = [note for note in notes if searchword in note['title'] or searchword in note['content']]
+    else:
+        filtered_notes = notes.copy()
+    
+    if order == "新しい順":
+        filtered_notes.sort(key=lambda x: x['date'], reverse=True)
+    elif order == "古い順":
+        filtered_notes.sort(key=lambda x: x['date'], reverse=False)
+    return render_template("index.html", searchword=searchword, orders=orders, notes=filtered_notes, len=len(notes),order=order)
 
 @app.route("/note")
 def hello_world():
     return render_template("note.html")
+
+@app.route("/delete", methods=["POST"])
+def delete_note():
+    note_id = int(request.form.get("id"))
+    global notes
+    notes = [note for note in notes if note["id"] != note_id]
+    return '', 204  # fetch用なので空レスポンス
 
 
 if __name__ == "__main__":
