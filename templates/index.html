@@ -10,7 +10,7 @@
         <!-- 検索フォーム -->
         <form method="post" style="display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
             <!-- 検索入力欄 -->
-            <input type="text" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）"
+            <input type="text" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）" value="{{searchword}}"
                 style="width: 30%; min-width: 150px; max-width: 50%; font-size: 1.2em; padding-right: 2em;"
                 oninput="document.getElementById('clear-btn').style.display = this.value ? 'block' : 'none';">
             <!-- 入力クリアボタン -->
