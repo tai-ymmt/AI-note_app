@@ -10,7 +10,7 @@
         <!-- 検索フォーム -->
         <form method="post" style="display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
             <!-- 検索入力欄 -->
-            <input type="text" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）" value="{{searchword}}"
+            <input type="text" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）" value="{{ searchword }}";
                 style="width: 30%; min-width: 150px; max-width: 50%; font-size: 1.2em; padding-right: 2em;"
                 oninput="document.getElementById('clear-btn').style.display = this.value ? 'block' : 'none';">
             <!-- 入力クリアボタン -->
@@ -20,18 +20,20 @@
             <button type="submit" style="font-size: 1.0em; margin-left: 1%;">🔍</button>
             <!-- 並び順プルダウン -->
             <select name="order" style="margin-left: 2%; font-size: 1.0em;">
-                <option value="new">新しい順</option>
-                <option value="old">古い順</option>
+                {% for order in orders %}
+                 <option value="{{ order }}">{{ order }}</option>
+                {% endfor %}
             </select>
             <!-- 右寄せ用スペース -->
             <span style="flex: 1;"></span>
             <!-- 新規ノート作成ボタン -->
-            <button type="button" style="font-size: 1.0em; margin-right: 10%;">＋ 新規ノート</button>
+            <button type="button" style="font-size: 1.0em; margin-right: 10%;" onclick="location.href='/note'">＋ 新規ノート</button>
         </form>
         <!-- ノート件数表示 -->
         <p style="margin: 8px 0 0 0;">
-            {{ none }}件のノート
+            {{ len }}件のノート
         </p>
+        {% if notes %}
         <!-- ノート一覧テーブル -->
         <table style="border: none; margin-top: 24px; width: 100%; border-collapse: collapse;" cellpadding="8" cellspacing="0">
             <thead>
@@ -44,26 +46,22 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <!-- ノートタイトル -->
-                    <td style="text-align: left;">サンプルノート1</td>
-                    <!-- ノート最終更新日 -->
-                    <td style="text-align: left;">2025年07月02日</td>
-                    <!-- 削除ボタン -->
-                    <td style="text-align: center;">
-                        <button type="button" onclick="confirmDeleteCustom(function(){ /* ここに削除処理 */ });" style="font-size: 1.0em;">🗑️</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align: left;">サンプルノート2</td>
-                    <td style="text-align: left;">2025年07月01日</td>
-                    <td style="text-align: center;">
-                        <button type="button" onclick="confirmDeleteCustom(function(){ /* ここに削除処理 */ });" style="font-size: 1.0em;">🗑️</button>
-                    </td>
-                </tr>
-            </tbody>
+            <today>
+        {% for note in notes: %}
+            {% set column = note %}
+            <tr>
+                {% for item in column: %}
+                    <td style="text-align: left;">{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+            </today>
         </table>
+        {% endif %}
+        <!-- ノートがない場合のメッセージ -->
+        {% if not notes %}
+            <p style="text-align: center; color: #999; margin-top: 24px;">ノートがありません</p>
+        {% endif %}
     </div>
 
     <!-- 削除確認モーダル -->
@@ -86,6 +84,13 @@
     </div>
 
     <script>
+
+    function clearbutton(){
+        document.getElementById('clear-btn').style.display = this.value ? 'block' : 'none';
+    }
+
+
+    
     // 削除時のコールバックを保持
     let deleteCallback = null;
 
@@ -114,6 +119,7 @@
             toast.style.display = 'none';
         }, 2000);
     }
+    clearbutton();
     </script>
 </body>
 </html>
