@@ -1,0 +1,42 @@
+/*loginページデザイン*/
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.login-container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+    width: 300px;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #337ab7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.message {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+}
