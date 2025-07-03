@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>ログイン</title>
-    <!-- Flask テンプレート（例: templates/index.html）内で -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
@@ -12,14 +11,34 @@
     <h2>ログイン</h2>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="message">{{ messages[0] }}</div>
+        {% for message in messages %}
+          <p style="color:red;">{{ message }}</p>
+        {% endfor %}
       {% endif %}
     {% endwith %}
+
     <form method="POST">
-        <input type="text" name="username" placeholder="ユーザー名">
-        <input type="password" name="password" placeholder="パスワード">
-        <button type="submit">ログイン</button>
+      {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.user_id.label }}<br>
+            {{ form.user_id(size=20) }}<br>
+            {% for error in form.user_id.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=16) }}<br>
+            {% for error in form.password.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <p>{{ form.submit() }}</p>
     </form>
-</div>
+    <p><a href="{{ url_for('newUser') }}">新規登録はこちら</a></p>
+  </div>
 </body>
 </html>
