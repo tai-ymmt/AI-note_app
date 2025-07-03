@@ -12,7 +12,7 @@
             <!-- 検索入力欄 -->
             <input type="text" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）" value="{{ searchword }}";
                 style="width: 30%; min-width: 150px; max-width: 50%; font-size: 1.2em; padding-right: 2em;"
-                oninput="document.getElementById('clear-btn').style.display = this.value ? 'block' : 'none';">
+                oninput="clearbutton()">
             <!-- 入力クリアボタン -->
             <button type="button" id="clear-btn" onclick="document.getElementById('searchword').value=''; this.style.display='none';"
                 style="display: none; position: absolute; right: 68%; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 1.2em; cursor: pointer;">✕</button>
@@ -86,7 +86,8 @@
     <script>
 
     function clearbutton(){
-        document.getElementById('clear-btn').style.display = this.value ? 'block' : 'none';
+        const searchWord = document.getElementById('searchword').value;
+        document.getElementById('clear-btn').style.display = searchWord ? 'block' : 'none';
     }
 
 
