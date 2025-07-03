@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -18,3 +19,16 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f'<User {self.user_id}>'
+
+
+class Note(db.Model):
+    __tablename__ = 'notes'
+
+    num = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_num = db.Column(db.Integer,nullable=False)
+    title = db.Column(db.String(20), nullable=False)
+    content = db.Column(db.Text, default=1, nullable=True)
+    created = db.Column(db.DateTime,default=datetime.utcnow)
+
+    def __repr__(self):
+        return self.title
