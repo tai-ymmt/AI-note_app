@@ -40,3 +40,131 @@ button {
     text-align: center;
     margin-bottom: 10px;
 }
+
+/* headerページデザイン*/
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+}
+
+.setting-actions {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #f0f0f0;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    gap: 8px;
+}
+/* text-decoration: none; リンクの下線を消したかったら*/
+.setting-link {
+text-decoration: none;
+color: #0a0101;
+font-weight: bold;
+}
+
+/*customページデザイン*/
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+}
+
+.setting-actions {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #f0f0f0;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    gap: 8px;
+}
+/* text-decoration: none; リンクの下線を消したかったら*/
+.setting-link {
+text-decoration: none;
+color: #0a0101;
+font-weight: bold;
+}
+
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #e8e1f0;
+}
+main {
+    padding: 20px;
+}
+.user-info {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+    max-width: 1500px;
+    margin: 30px auto;
+}
+.pathward-chenge-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #fffefe;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    gap: 8px;
+}
+.theme-setting {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+    max-width: 1500px;
+    margin: 30px auto;
+}
+
+body.light-mode {
+    background-color: #ffffff;
+    color: #000000;
+}
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.AI-setting {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+    max-width: 1500px;
+    margin: 50px auto;
+}
+#logout-btn {
+    background-color: #d82133;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 175px;
+}
+#save-setting {
+    background-color: #800080;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 1625px;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
