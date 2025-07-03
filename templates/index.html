@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ノート一覧</title>
+</head>
+<body>
+  <h1>ノート一覧</h1>
+  <button id="create-note-btn">新規ノート作成</button>
+  <ul>
+    {% for note in notes %}
+      <li>
+        <a href="/note/{{ note.id }}">{{ note.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <script>
+    document.getElementById('create-note-btn').addEventListener('click', function() {
+      fetch('/note/create', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          // 作成後、そのノートの編集画面へ移動
+          window.location.href = '/note/' + data.note_id;
+        });
+    });
+  </script>
+</body>
+</html>
