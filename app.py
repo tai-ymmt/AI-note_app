@@ -40,5 +40,11 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
+@app.route('/settings')
+def settings_page():
+    return render_template('custom.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)

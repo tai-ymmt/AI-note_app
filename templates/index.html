@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>マイページ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header>
+            {% include "header.html" %}
+    </header>
+    <main>
     <h1>ようこそ、{{ name }} さん</h1>
     <p><a href="{{ url_for('logout') }}">ログアウト</a></p>
+    </main>
 </body>
 </html>

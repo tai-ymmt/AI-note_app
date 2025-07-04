@@ -3,23 +3,11 @@
 <head>
     <meta chaeset="UTF-8">
     <title>設定画面</title>
-    <link rel="stylesheet" href="setting.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <div class="app-header">
-            <div class="app-icon">
-                <a href="一覧画面へのpath" class="icon">
-                    <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
-                       <rect x="10" y="10" width="180" height="40" rx="10" ry="10" fill="purple" />
-                    </svg>
-                </a>
-            </div>
-            <a href="設定画面へのpath" class="setting-actions">
-                <span class="gear-icon">⚙️</span>
-                <span class="setting-link">設定</span>
-            </a>
-        </div>
+            {% include "header.html" %}
     </header>
     <script>
         if (window.location.pathname.includes("setting")) {
@@ -45,22 +33,19 @@
             </select>
         </section>
 
-        
-    <script>
-        document.getElementById('theme-select').addEventListener('change', function() {
-        const selectedTheme = this.value;
-        document.body.classList.remove('light-mode', 'dark-mode');
-        document.body.classList.add(selectedTheme + '-mode');
-        });
-    </script>
-
-
         <section class="AI-setting">
             <h2>AI設定(デフォルト)</h2>
             <p>AI機能の出力形式や言語レベルを設定できます</p>
         </section>
     </main>
 <button id="logout-btn">ログアウト</button>
+<script>
+    document.getElementById("logout-btn").addEventListener("click", function() {
+        if (confirm("本当にログアウトしますか？")) {
+            window.location.href = "/logout";
+        }
+    });
+</script>
 <button id="save-setting">設定を保存</button>
 </body>
 </html>
