@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>パスワード変更</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+<div class="login-container">
+    <a href="/custom"><div>戻る</div></a>
+    <h2>パスワード変更</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p style="color:red;">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.now_password.label }}<br>
+            {{ form.now_password(size=16) }}<br>
+            {% for error in form.now_password.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.changed_password.label }}<br>
+            {{ form.changed_password(size=16) }}<br>
+            {% for error in form.changed_password.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.changed_confirm.label }}<br>
+            {{ form.changed_confirm(size=16) }}<br>
+            {% for error in form.changed_confirm.errors %}
+                <span style="color:red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <p>{{form.submit()}}</p>
+        <h4>※パスワード変更後はログインページに移動します。</h4>
+    </form>
+
+</div>
+</body>
+</html>

@@ -17,15 +17,16 @@ class NewUserForm(FlaskForm):
 
     password = PasswordField('パスワード', validators=[
         DataRequired(),
-        Length(min=8, max=64, message='パスワードは8文字以上64文字以下で入力してください。'),
+        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください。'),
         Regexp(
-            r'^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]+$',
-            message='パスワードは半角英数字のみで、英字と数字の両方を含めてください。'
+            r'^[a-zA-z0-9]+$',
+            message='パスワードは半角英数字のみで作成してください'
         )
     ])
 
     confirm = PasswordField('パスワード（確認）', validators=[
         DataRequired(),
+        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください。'),
         EqualTo('password', message='パスワードが一致しません。')
     ])
 
@@ -43,16 +44,44 @@ class NewUserForm(FlaskForm):
 #ログインフォーム
 class LoginForm(FlaskForm):
     user_id = StringField('ユーザーID', validators=[
-        DataRequired(),
         Length(max=20)
     ])
 
     password = PasswordField('パスワード', validators=[
-        DataRequired(),
-        Length(min=8, max=16)
+        Length(max=16)
     ])
 
     submit = SubmitField('ログイン')
+
+#パスワードハッシュ化処理
+    def get_hashed_password(self):
+        return generate_password_hash(self.password.data)
+    
+
+#パスワード変更フォーム
+class ChangePasswordForm(FlaskForm):
+    now_password = PasswordField('現在のパスワード', validators=[
+        DataRequired(),
+        Length(min=8,max=16)
+    ])
+
+    changed_password = PasswordField('新しいパスワード', validators=[
+        DataRequired(),
+        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください。'),
+        Regexp(
+            r'^[a-zA-Z0-9]+$',
+            message='パスワードは半角英数字のみで作成してください'
+            )
+    ])
+
+    changed_confirm = PasswordField('新しいパスワード（確認）', validators=[
+        DataRequired(),
+        Length(min=8, max=16),
+        EqualTo('changed_password', message='パスワードが一致しません。')
+
+    ])
+
+    submit = SubmitField('変更')
 
 #パスワードハッシュ化処理
     def get_hashed_password(self):

@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
-from forms import LoginForm, NewUserForm
+from forms import LoginForm, NewUserForm ,ChangePasswordForm
 from models import db, User, Note
 
 app = Flask(__name__)
@@ -15,15 +15,15 @@ login_manager.login_view = 'login'
 login_manager.init_app(app)
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def load_user(num):
+    return User.query.get(int(num))
 
 
 #一覧ページへ
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html', name=current_user.user_id)
+    return render_template('index.html', user_id=current_user.user_id)
 
 #ログインページへ
 @app.route('/login', methods=['GET', 'POST'])
@@ -40,16 +40,17 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page or url_for('index'))
         else:
-            flash('ユーザー名かパスワードが正しくありません。')
+            flash('ユーザーIDかパスワードが正しくありません。')
+            return redirect(url_for('login'))
 
     return render_template('login.html', form=form)
 
 @app.route('/newUser', methods=['GET', 'POST'])
 def newUser():
+    form = NewUserForm()
     if current_user.is_authenticated:
         return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
 
-    form = NewUserForm()
     
     if form.validate_on_submit():
         # フォームの入力内容を元に新規ユーザー作成
@@ -73,6 +74,34 @@ def newUser():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+#パスワード変更
+@app.route('/changePassword', methods=['GET', 'POST'])
+@login_required
+def changePassword():
+    form = ChangePasswordForm()
+    
+    if form.validate_on_submit():
+        # 現在のパスワードチェック
+        if not check_password_hash(current_user.password, form.now_password.data):
+            flash('現在のパスワードが正しくありません')
+            return render_template('change_pass.html', form=form)
+        
+        #現在と一致している場合エラー
+        if not check_password_hash(current_user.password, form.changed_password.data):
+            flash('新しいパスワードが現在のパスワードと同じです')
+            return render_template('change_pass.html', form=form)
+        
+        current_user.password = generate_password_hash(form.changed_password.data)
+        db.session.commit()
+        #遷移前にログアウト
+        logout_user()
+        flash('パスワード変更しました。ログインしてください')
+        return redirect(url_for('login'))
+    
+    return render_template('change_pass.html',form=form)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
