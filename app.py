@@ -3,6 +3,8 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash
 from config import Config
 from models import db, User, Note
+from forms import LoginForm, NewUserForm
+from datetime import datetime
 
 # AI用
 from google import genai
@@ -20,6 +22,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 @app.route('/')
 @login_required
@@ -53,6 +56,7 @@ def save_note(note_id):
     data = request.json
     note.title = data.get('title', note.title)
     note.content = data.get('content', note.content)
+    note.update_time = datetime.utcnow()
     db.session.commit()
     return jsonify({'message': '保存しました'})
 
@@ -79,6 +83,29 @@ def login():
             flash('ログイン情報が正しくありません。')
     return render_template('login.html')
 
+@app.route('/newUser', methods=['GET', 'POST'])
+def newUser():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
+
+    form = NewUserForm()
+    
+    if form.validate_on_submit():
+        # フォームの入力内容を元に新規ユーザー作成
+        hashed_password = form.get_hashed_password()  # ハッシュ化されたパスワードを取得
+
+        new_user = User(
+            user_id=form.user_id.data,
+            password=hashed_password
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('ユーザー登録が完了しました。ログインしてください。')
+        return redirect(url_for('login'))  # login ページにリダイレクト
+    
+    return render_template('new_user.html', form=form)
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -91,10 +118,30 @@ def logout():
 def ai_search():
     data = request.json
     keyword = data.get('keyword', '').strip()
+    ai_level_flag = int(data.get('ai_level_flag', current_user.ai_level_flag))
+    ai_answer_flag = int(data.get('ai_answer_flag', current_user.ai_answer_flag))
+
     if not keyword:
         return jsonify({'result': 'キーワードを入力してください'}), 400
 
-    prompt = f"{keyword}について日本語で200文字程度で解説してください。"
+    # プロンプト生成（条件分岐で内容を変える）
+    # 出力形式（ai_answer_flag）: 0=シンプル, 1=詳細, 2=箇条書き
+    # 難易度（ai_level_flag）: 0=初学者, 1=普通, 2=専門的
+
+    format_text = {
+        0: "できるだけ簡潔に（要点だけをまとめて200文字程度で）",
+        1: "詳細に、できるだけ具体的に（500文字程度で）",
+        2: "要点をまとめて箇条書きで4行程度で"
+    }[ai_answer_flag]
+
+    level_text = {
+        0: "初心者向けに",
+        1: "一般的なレベルで",
+        2: "専門家向けに"
+    }[ai_level_flag]
+
+    prompt = f"{keyword}について{level_text}、{format_text}、前置きはなくして日本語で解説してください。"
+
     try:
         client = genai.Client(api_key=GENAI_API_KEY)
         response = client.models.generate_content(
@@ -108,11 +155,7 @@ def ai_search():
         summary = "AIによる解説の取得中にエラーが発生しました"
     return jsonify({'result': summary})
 
-# AI設定保存（仮）
-@app.route('/api/ai_settings', methods=['POST'])
-@login_required
-def ai_settings():
-    return jsonify({'message': 'AI設定を保存しました'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
