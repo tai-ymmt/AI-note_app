@@ -60,7 +60,7 @@
                     <td style="text-align: center;">
                         <!-- ノート一覧テーブル内の削除ボタン -->
                         <button type="button"
-                            onclick="confirmDeleteCustom('{{ note.id }}', '{{ note.title|e }}')"
+                            onclick="event.stopPropagation(); confirmDeleteCustom('{{ note.id }}', '{{ note.title|e }}')"
                             style="font-size: 1.0em;">🗑️</button>
                     </td>
             </tr>
