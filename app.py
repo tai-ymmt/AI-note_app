@@ -102,8 +102,7 @@ def delete_note():
     cursor = connection.cursor()
     sql = "DELETE FROM notes WHERE num = %s"
     cursor.execute(sql, (note_id,))
-    global notes
-    notes = cursor.fetchall()
+    connection.commit()
     cursor.close()
     connection.close()
     return '', 204  # fetch用なので空レスポンス
