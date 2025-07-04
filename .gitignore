@@ -1,0 +1,3 @@
+# Python バイトコードファイル
+*.pyc
+__pycache__/

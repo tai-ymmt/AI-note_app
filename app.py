@@ -1,83 +1,101 @@
-from flask import Flask, render_template, request, redirect, jsonify
-from google import genai 
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import check_password_hash
+from config import Config
+from models import db, User, Note
 
-
-app = Flask(__name__)
-
-# 仮のノートデータ
-notes = [
-    {'id': 1, 'title': 'サンプルノート1', 'content': '<b>これはサンプルです。</b>'},
-    {'id': 2, 'title': 'メモ', 'content': '本文2'},
-    {'id': 3, 'title': 'サンプルノート2', 'content': '<b>これはサンプルです。</b>'},
-    {'id': 4, 'title': '削除ノート', 'content': '削除確認のノート'}
-]
-
-def find_note(note_id):
-    for note in notes:
-        if note['id'] == note_id:
-            return note
-    return None
-
-# APIキーの設定
+# AI用
+from google import genai
 GENAI_API_KEY = "AIzaSyCjjC-YoxhZIzNlCfznMeKQg138BptwDHU"
 client = genai.Client(api_key=GENAI_API_KEY)
 
-# トップページはノート一覧（index.html）
+app = Flask(__name__)
+app.config.from_object(Config)
+db.init_app(app)
+
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html', notes=notes)
-
-# ノート編集ページ（note.html）
-@app.route('/note/<int:note_id>')
-def edit_note(note_id):
-    note = find_note(note_id)
-    if not note:
-        return "ノートが見つかりません", 404
-    return render_template('note.html', note=note)
-
-next_note_id = max(note['id'] for note in notes) + 1 if notes else 1
+    notes = Note.query.filter_by(user_num=current_user.num).order_by(Note.update_time.desc()).all()
+    #notes = Note.query.filter_by(user_num=current_user.num).order_by(Note.created.desc()).all()
+    return render_template('index.html', notes=notes, name=current_user.user_id)
 
 @app.route('/note/create', methods=['POST'])
+@login_required
 def create_note():
-    global notes, next_note_id
-    new_note = {
-        'id': next_note_id,
-        'title': '新しいノート',
-        'content': ''
-    }
-    notes.append(new_note)
-    note_id = next_note_id
-    next_note_id += 1
-    return jsonify({'note_id': note_id})
+    note = Note(title="新しいノート", content="", user_num=current_user.num)
+    db.session.add(note)
+    db.session.commit()
+    return jsonify({'note_id': note.num})
 
+@app.route('/note/<int:note_id>')
+@login_required
+def edit_note(note_id):
+    note = Note.query.get_or_404(note_id)
+    if note.user_num != current_user.num:
+        return "権限がありません", 403
+    return render_template('note.html', note=note)
 
 @app.route('/note/<int:note_id>/save', methods=['POST'])
+@login_required
 def save_note(note_id):
-    note = find_note(note_id)
-    if not note:
-        return jsonify({'error': 'ノートが見つかりません'}), 404
+    note = Note.query.get_or_404(note_id)
+    if note.user_num != current_user.num:
+        return jsonify({'error': '権限がありません'}), 403
     data = request.json
-    note['title'] = data.get('title', note['title'])
-    note['content'] = data.get('content', note['content'])
+    note.title = data.get('title', note.title)
+    note.content = data.get('content', note.content)
+    db.session.commit()
     return jsonify({'message': '保存しました'})
 
 @app.route('/note/<int:note_id>/delete', methods=['POST'])
+@login_required
 def delete_note(note_id):
-    global notes
-    notes = [note for note in notes if note['id'] != note_id]
+    note = Note.query.get_or_404(note_id)
+    if note.user_num != current_user.num:
+        return jsonify({'error': '権限がありません'}), 403
+    db.session.delete(note)
+    db.session.commit()
     return jsonify({'message': '削除しました'})
 
-# AI関連API
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user_id = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(user_id=user_id).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('ログイン情報が正しくありません。')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# ★AI要約API
 @app.route('/api/ai_search', methods=['POST'])
+@login_required
 def ai_search():
     data = request.json
     keyword = data.get('keyword', '').strip()
     if not keyword:
         return jsonify({'result': 'キーワードを入力してください'}), 400
 
-    prompt = f"{keyword}について日本語で**200文字程度で**解説してください。"
+    prompt = f"{keyword}について日本語で200文字程度で解説してください。"
     try:
-        # APIキーをここで渡す
         client = genai.Client(api_key=GENAI_API_KEY)
         response = client.models.generate_content(
             model="gemini-2.5-flash",
@@ -90,8 +108,9 @@ def ai_search():
         summary = "AIによる解説の取得中にエラーが発生しました"
     return jsonify({'result': summary})
 
-
+# AI設定保存（仮）
 @app.route('/api/ai_settings', methods=['POST'])
+@login_required
 def ai_settings():
     return jsonify({'message': 'AI設定を保存しました'})
 
