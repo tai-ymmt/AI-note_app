@@ -88,8 +88,8 @@
     @media (max-width: 700px) { .main-content, .top-bar { padding: 0 0.5rem; } .editor-section, .ai-sidebar { padding: 1.5rem 1rem; } .note-title-input { font-size: 1.5rem; } .modal-inner { min-width: 90vw; padding: 1.5em 1em; } }
   </style>
 </head>
-<body>
-
+<body> 
+  {% include "header.html" %}   
   <div class="top-bar">
     <button class="note-back-btn" id="back-btn"><i class="fas fa-arrow-left"></i> ノート一覧</button>
     <div class="top-bar-right">
@@ -100,7 +100,7 @@
   <main class="main-content">
     <section class="editor-section">
       <div class="note-title-bar">
-        <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力..." value="{{ note.title }}">
+        <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
       </div>
       <div class="editor-toolbar">
         <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
@@ -118,7 +118,7 @@
     </section>
     <aside class="ai-sidebar">
       <div class="sidebar-header"><span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span><button class="btn btn-ghost" id="open-ai-settings-btn"><i class="fas fa-cog"></i></button></div>
-      <div class="ai-search-section"><div class="search-input-wrapper"><input type="text" class="search-input" placeholder="検索したいキーワード" /><button class="search-btn"><i class="fas fa-search"></i></button></div></div>
+      <div class="ai-search-section"><div class="search-input-wrapper"><input type="text" class="search-input" placeholder="検索したいキーワード"maxlength="20" required/><button class="search-btn"><i class="fas fa-search"></i></button></div></div>
       <div class="ai-results">
         <div id="ai-loading" style="display: none; text-align:center;">
           <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
@@ -144,7 +144,21 @@
   <div id="ai-settings-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost"><i class="fas fa-times"></i></button></div>
-      <form id="ai-settings-form"><div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label><select id="output-format" class="modal-select"><option value="simple">シンプル</option><option value="detailed">詳細</option><option value="bullet">箇条書き</option></select></div><div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label><select id="target-level" class="modal-select"><option value="beginner">初学者</option><option value="intermediate">普通</option><option value="advanced">専門的</option></select></div><div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label><textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea></div><div class="modal-actions"><button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button><button type="submit" class="btn btn-save">保存</button></div></form>
+      <form id="ai-settings-form"><div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
+        <select id="output-format" class="modal-select">
+            <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
+            <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
+            <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
+        </select>
+    </div>
+    <div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
+        <select id="target-level" class="modal-select">
+            <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
+            <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
+            <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
+        </select>
+    </div>
+    <div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label><textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea></div><div class="modal-actions"><button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button><button type="submit" class="btn btn-save">保存</button></div></form>
     </div>
   </div>
 
@@ -203,7 +217,7 @@
       const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
       const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
       // noteIdをJinja2のまま数値で渡す（重要！）
-      const noteId = {{ note.id }};
+      const noteId = {{ note.num}};
 
       // ===== イベントリスナーの登録 =====
       backBtn.addEventListener('click', () => { window.location.href = '/'; });
@@ -252,8 +266,13 @@
         fetch('/api/ai_search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ keyword })
+            body: JSON.stringify({
+            keyword,
+            ai_level_flag: document.getElementById('target-level').value,
+            ai_answer_flag: document.getElementById('output-format').value
+            })
         })
+
         .then(res => res.json())
         .then(data => {
             aiLoading.style.display = 'none';
@@ -309,6 +328,7 @@
         }, 2500);
       }
     });
-  </script>
+    
+  </script>  
 </body>
 </html>
