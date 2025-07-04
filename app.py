@@ -2,7 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
-from models import db, User
+from models import db, User, Note
+import pymysql
+
+def getConnection():
+    return pymysql.connect(
+        host='localhost',
+        db='ai_note',
+        user='note_User',
+        password='NOTE-uSER',
+        charset='utf8',
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -16,10 +27,11 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/')
 @login_required
 def index():
     return render_template('index.html', name=current_user.user_id)
+
+orders = ["新しい順", "古い順"]
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -35,39 +47,49 @@ def login():
     return render_template('login.html')
 
 @app.route('/logout')
+
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-
-orders = ["新しい順", "古い順"]
-notes = [
-    {"id":1, "title": "ノート1",  "date": "2000-01-01", "content": "こんにちは"},
-    {"id":2, "title": "ノート2",  "date": "2000-01-02", "content": "こんばんは"},
-    {"id":3, "title": "ノート3",  "date": "2000-01-03", "content": "おはようございます"},
-]
-print(len(notes))
-
 @app.route("/", methods=["GET", "POST"])
 def index():
+    connection = getConnection()
+    cursor = connection.cursor()
+    sql = "SELECT * FROM notes"
+    cursor.execute(sql)
+    notes = cursor.fetchall()
+
     searchword = ""
     order = "新しい順"
-    filtered_notes = notes.copy()
+
     if request.method == "POST":
         searchword = request.form.get("searchword")
         order = request.form.get('order')
     
     if searchword:
-        filtered_notes = [note for note in notes if searchword in note['title'] or searchword in note['content']]
+        if order == "新しい順":
+            sql = "SELECT * FROM notes WHERE title LIKE %s OR content LIKE %s ORDER BY update_time DESC"
+            cursor.execute(sql, ('%' + searchword + '%', '%' + searchword + '%'))
+            notes = cursor.fetchall()
+        elif order == "古い順":
+            sql = "SELECT * FROM notes WHERE title LIKE %s OR content LIKE %s ORDER BY update_time ASC"
+            cursor.execute(sql, ('%' + searchword + '%', '%' + searchword + '%'))
+            notes = cursor.fetchall()
     else:
-        filtered_notes = notes.copy()
+        if order == "新しい順":
+            sql = "SELECT * FROM notes ORDER BY update_time DESC"
+            cursor.execute(sql)
+            notes = cursor.fetchall()
+        elif order == "古い順":
+            sql = "SELECT * FROM notes ORDER BY update_time ASC"
+            cursor.execute(sql)
+            notes = cursor.fetchall()
     
-    if order == "新しい順":
-        filtered_notes.sort(key=lambda x: x['date'], reverse=True)
-    elif order == "古い順":
-        filtered_notes.sort(key=lambda x: x['date'], reverse=False)
-    return render_template("index.html", searchword=searchword, orders=orders, notes=filtered_notes, len=len(notes),order=order)
+    cursor.close()
+    connection.close()
+    return render_template("index.html", searchword=searchword, orders=orders, notes=notes, len=len(notes),order=order)
 
 @app.route("/note")
 def hello_world():
@@ -76,8 +98,14 @@ def hello_world():
 @app.route("/delete", methods=["POST"])
 def delete_note():
     note_id = int(request.form.get("id"))
+    connection = getConnection()
+    cursor = connection.cursor()
+    sql = "DELETE FROM notes WHERE num = %s"
+    cursor.execute(sql, (note_id,))
     global notes
-    notes = [note for note in notes if note["id"] != note_id]
+    notes = cursor.fetchall()
+    cursor.close()
+    connection.close()
     return '', 204  # fetch用なので空レスポンス
 
 if __name__ == '__main__':
