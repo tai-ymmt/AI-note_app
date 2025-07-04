@@ -3,17 +3,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from models import db, User, Note
-import pymysql
-
-def getConnection():
-    return pymysql.connect(
-        host='localhost',
-        db='ai_note',
-        user='note_User',
-        password='NOTE-uSER',
-        charset='utf8',
-        cursorclass=pymysql.cursors.DictCursor
-    )
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -54,12 +43,9 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route("/", methods=["GET", "POST"])
+@login_required
 def index():
-    connection = getConnection()
-    cursor = connection.cursor()
-    sql = "SELECT * FROM notes"
-    cursor.execute(sql)
-    notes = cursor.fetchall()
+    notes = Note.query.all()
 
     searchword = ""
     order = "新しい順"
@@ -70,25 +56,15 @@ def index():
     
     if searchword:
         if order == "新しい順":
-            sql = "SELECT * FROM notes WHERE title LIKE %s OR content LIKE %s ORDER BY update_time DESC"
-            cursor.execute(sql, ('%' + searchword + '%', '%' + searchword + '%'))
-            notes = cursor.fetchall()
+            notes = Note.query.filter((Note.user_num == current_user.num) & ((Note.title.like(f'%{searchword}%')) | (Note.content.like(f'%{searchword}%')))).order_by(Note.update_time.desc()).all()
+
         elif order == "古い順":
-            sql = "SELECT * FROM notes WHERE title LIKE %s OR content LIKE %s ORDER BY update_time ASC"
-            cursor.execute(sql, ('%' + searchword + '%', '%' + searchword + '%'))
-            notes = cursor.fetchall()
+            notes = Note.query.filter((Note.user_num == current_user.num) & ((Note.title.like(f'%{searchword}%')) | (Note.content.like(f'%{searchword}%')))).order_by(Note.update_time.asc()).all()
     else:
         if order == "新しい順":
-            sql = "SELECT * FROM notes ORDER BY update_time DESC"
-            cursor.execute(sql)
-            notes = cursor.fetchall()
+            notes = Note.query.filter(Note.user_num == current_user.num).order_by(Note.update_time.desc()).all()
         elif order == "古い順":
-            sql = "SELECT * FROM notes ORDER BY update_time ASC"
-            cursor.execute(sql)
-            notes = cursor.fetchall()
-    
-    cursor.close()
-    connection.close()
+            notes = Note.query.filter(Note.user_num == current_user.num).order_by(Note.update_time.asc()).all()
     return render_template("index.html", searchword=searchword, orders=orders, notes=notes, len=len(notes),order=order)
 
 @app.route("/note")
@@ -98,14 +74,12 @@ def hello_world():
 @app.route("/delete", methods=["POST"])
 def delete_note():
     note_id = int(request.form.get("id"))
-    connection = getConnection()
-    cursor = connection.cursor()
-    sql = "DELETE FROM notes WHERE num = %s"
-    cursor.execute(sql, (note_id,))
-    connection.commit()
-    cursor.close()
-    connection.close()
-    return '', 204  # fetch用なので空レスポンス
+    destroy_note = Note.query.get(note_id)
+    db.session.delete(destroy_note)
+    db.session.commit()
+
+    notes = Note.query.all()
+    return render_template('index.html', notes=notes)
 
 if __name__ == '__main__':
     app.run(debug=True)
