@@ -18,6 +18,11 @@ login_manager.init_app(app)
 def load_user(num):
     return User.query.get(int(num))
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('ログインが必要です。先にログインしてください。', 'danger')  # カスタムメッセージ
+    return redirect(url_for('login'))
+
 
 #一覧ページへ
 @app.route('/')

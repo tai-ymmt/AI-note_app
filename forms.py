@@ -14,26 +14,26 @@ class NewUserForm(FlaskForm):
         Regexp(r'^[a-zA-Z0-9]+$', message='ユーザー名は半角英数字のみ使用できます。')
 
     ],
-    render_kw={"placeholder": "半角英数字で入力をお願いします"}
+    render_kw={"placeholder": "半角英数字で入力してください"}
     )
 
     password = PasswordField('パスワード', validators=[
         DataRequired(),
-        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください。'),
+        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください'),
         Regexp(
             r'^[a-zA-z0-9]+$',
             message='パスワードは半角英数字のみで作成してください'
         )
     ],
-    render_kw={"placeholder": "半角英数字で8~16文字で入力をお願いします"}
+    render_kw={"placeholder": "半角英数字で8~16文字で入力してください"}
     )
 
     confirm = PasswordField('パスワード（確認）', validators=[
         DataRequired(),
-        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください。'),
-        EqualTo('password', message='パスワードが一致しません。')
+        Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください'),
+        EqualTo('password', message='パスワードが一致しません')
     ],
-    render_kw={"placeholder": "パスワード欄と同じものを入力してください"}
+    render_kw={"placeholder": "再度同じパスワードを入力してください"}
     )
 
     submit = SubmitField('登録')
@@ -41,7 +41,7 @@ class NewUserForm(FlaskForm):
 #登録されているかチェック
     def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
-            raise ValidationError('このユーザー名はすでに使用されています。')
+            raise ValidationError('このユーザー名はすでに使用されています')
         
 #パスワードハッシュ化処理
     def get_hashed_password(self):
@@ -53,14 +53,14 @@ class LoginForm(FlaskForm):
         DataRequired(),
         Length(max=20)
     ],
-    render_kw={"placeholder": "半角英数字で20文字以内"}
+    render_kw={"placeholder": "半角英数字で20文字以内で入力してください"}
     )
 
     password = PasswordField('パスワード', validators=[
         DataRequired(),
-        Length(min=8, max=16, message='パスワードは8文字以上')
+        Length(min=8, max=16, message='パスワードは8文字以上で入力してください')
     ],
-    render_kw={"placeholder": "半角英数字で8文字以上"}
+    render_kw={"placeholder": "半角英数字で8文字以上で入力してください"}
     )
 
     submit = SubmitField('ログイン')
@@ -87,7 +87,7 @@ class ChangePasswordForm(FlaskForm):
             message='パスワードは半角英数字のみで作成してください'
             )
     ],
-    render_kw={"placeholder": "半角英数字で現在とは異なるパスワードを入力"}
+    render_kw={"placeholder": "新しいパスワードを入力してください"}
     )
 
     changed_confirm = PasswordField('新しいパスワード（確認）', validators=[
@@ -96,7 +96,7 @@ class ChangePasswordForm(FlaskForm):
         EqualTo('changed_password', message='パスワードが一致しません。')
 
     ],
-    render_kw={"placeholder": "新しいパスワード欄と同じものを入力してください"}
+    render_kw={"placeholder": "再度同じパスワードを入力してください"}
     )
 
     submit = SubmitField('変更')
