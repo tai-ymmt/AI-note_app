@@ -56,7 +56,7 @@
             {% for note in notes: %}
             <tr id="hyou" onclick="location.href='/note'">
                     <td style="text-align: left;" >{{ note.title }}</td>
-                    <td style="text-align: left;">{{ note.update_time.strftime('%Y-%m-%d') }}</td>
+                    <td style="text-align: left;">{{ note.update_time.strftime('%Y年%m月%d日') }}</td>
                     <td style="text-align: center;">
                         <!-- ノート一覧テーブル内の削除ボタン -->
                         <button type="button"
