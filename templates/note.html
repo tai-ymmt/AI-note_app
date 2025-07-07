@@ -51,7 +51,7 @@
     .welcome-features { display: flex; gap: 1.15em; margin-top: 0.9em; flex-wrap: wrap; justify-content: center; }
     .feature-item { display: flex; align-items: center; gap: 0.35em; color: #bbb; font-size: 0.98em; }
     
-    //トースト通知部分
+    
     #toast {
       position: fixed; right: 32px; bottom: 32px;
       min-width: 180px;
@@ -90,24 +90,26 @@
     @media (max-width: 700px) { .main-content, .top-bar { padding: 0 0.5rem; } .editor-section, .ai-sidebar { padding: 1.5rem 1rem; } .note-title-input { font-size: 1.5rem; } .modal-inner { min-width: 90vw; padding: 1.5em 1em; } }
   </style>
 </head>
-<body> 
-  {% include "header.html" %}   //header.htmlの読み込み
-  //トップバー
-  <div class="top-bar"> //ノート一覧に戻るボタン、保存ボタン、削除ボタン
-    <button class="note-back-btn" id="back-btn"><i class="fas fa-arrow-left"></i> ノート一覧</button>
+<body>
+  <!-- header.htmlの読み込み -->
+  {% include "header.html" %}
+
+  <!-- トップバー：ノート一覧に戻るボタン、保存ボタン、削除ボタン -->
+  <div class="top-bar">
+    <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
     <div class="top-bar-right">
       <button class="btn btn-save" id="save-note-btn"><i class="fas fa-save"></i> 保存</button>
       <button class="btn btn-delete" id="delete-note-btn"><i class="fas fa-trash-alt"></i> 削除</button>
     </div>
   </div>
-  //編集領域
-  <main class="main-content"> //ノート編集（タイトル＋リッチテキストエディタ）
+  
+  <!-- 編集領域：ノート編集（タイトル＋リッチテキストエディタ） -->
+  <main class="main-content">
     <section class="editor-section">
       <div class="note-title-bar">
         <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
       </div>
-
-      //エディタツールバー
+      <!-- エディタツールバー -->
       <div class="editor-toolbar">
         <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
         <button class="toolbar-btn" data-command="italic" title="斜体"><i class="fas fa-italic"></i></button>
@@ -120,27 +122,24 @@
         <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
         <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
       </div>
-      //contenteditable="true" でリッチテキスト編集対応
-
-      //リッチエディタ本体
+      <!-- リッチエディタ本体 -->
       <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
     </section>
-    <aside class="ai-sidebar"> //AI検索（Geminiによる要約/サジェスト）
-
-        //AIヘッダー
+    <!-- AI検索（Geminiによる要約/サジェスト） -->
+    <aside class="ai-sidebar">
+      <!-- AIヘッダー -->
       <div class="sidebar-header">
         <span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span>
-        <button class="btn btn-ghost" id="open-ai-settings-btn"><i class="fas fa-cog"></i></button></div>
-
-        //AI検索欄
+        <button class="btn btn-ghost" id="open-ai-settings-btn" aria-label="AI詳細設定"><i class="fas fa-cog"></i></button>
+      </div>
+      <!-- AI検索欄 -->
       <div class="ai-search-section">
         <div class="search-input-wrapper">
-            <input type="text" class="search-input" placeholder="検索したいキーワード"maxlength="20" required/>
-            <button class="search-btn"><i class="fas fa-search"></i></button>
+          <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="20" required />
+          <button class="search-btn" aria-label="AI検索"><i class="fas fa-search"></i></button>
         </div>
-    </div>
-
-    AI結果表示欄
+      </div>
+      <!-- AI結果表示欄 -->
       <div class="ai-results">
         <div id="ai-loading" style="display: none; text-align:center;">
           <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
@@ -157,40 +156,43 @@
           </div>
         </div>
       </div>
-      
     </aside>
   </main>
   
-  //AIトースト通知
-  <div id="toast"></div> 
+  <!-- AIトースト通知 -->
+  <div id="toast"></div>
 
-  //AI詳細設定
+  <!-- AI詳細設定モーダル -->
   <div id="ai-settings-modal" class="modal-outer">
     <div class="modal-inner">
-      <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost"><i class="fas fa-times"></i></button></div>
-      <form id="ai-settings-form"><div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
-        <select id="output-format" class="modal-select">
+      <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost" aria-label="閉じる"><i class="fas fa-times"></i></button></div>
+      <form id="ai-settings-form">
+        <div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
+          <select id="output-format" class="modal-select">
             <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
             <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
             <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
-        </select>
-    </div>
-    <div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
-        <select id="target-level" class="modal-select">
+          </select>
+        </div>
+        <div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
+          <select id="target-level" class="modal-select">
             <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
             <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
             <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
-        </select>
-    </div>
-    <div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label>
-        <textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea></div>
-    <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button>
-        <button type="submit" class="btn btn-save">保存</button></div></form>
+          </select>
+        </div>
+        <div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label>
+          <textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button>
+          <button type="submit" class="btn btn-save">保存</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  //ノート削除確認
+  <!-- ノート削除確認モーダル -->
   <div id="delete-confirm-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -245,8 +247,8 @@
       const deleteConfirmModal = document.getElementById('delete-confirm-modal');
       const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
       const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-      // noteIdをJinja2のまま数値で渡す（重要！）
-      const noteId = {{ note.num}};
+      // noteIdをJinja2のまま数値で渡す（安全にtojsonで渡す）
+      const noteId = {{ note.num | tojson }};
 
       // ===== ノート保存 =====
       backBtn.addEventListener('click', () => { window.location.href = '/'; });
@@ -260,7 +262,8 @@
           body: JSON.stringify({ title, content })
         })
         .then(res => res.json())
-        .then(data => showToast(data.message || 'ノートが保存されました'));
+        .then(data => showToast(data.message || 'ノートが保存されました'))
+        .catch(() => showToast('ノートの保存に失敗しました'));
       });
 
       // ノート削除
@@ -276,7 +279,8 @@
           .then(data => {
             showToast(data.message || 'ノートを削除しました。');
             setTimeout(() => window.location.href = '/', 1200);
-          });
+          })
+          .catch(() => showToast('ノートの削除に失敗しました'));
         deleteConfirmModal.classList.remove('is-visible');
       });
       
@@ -301,7 +305,6 @@
             ai_answer_flag: document.getElementById('output-format').value
             })
         })
-
         .then(res => res.json())
         .then(data => {
             aiLoading.style.display = 'none';
@@ -315,6 +318,7 @@
             document.getElementById('paste-to-note-btn').addEventListener('click', () => {
                 const aiOutputText = document.getElementById('ai-output-text').innerText;
                 const editor = document.querySelector('.rich-editor');
+                // ここでinnerTextにしているのでHTMLタグが混じらない形
                 editor.innerHTML += `<br>${aiOutputText}`;
                 showToast('AI出力をノートに貼り付けました');
             });
@@ -324,9 +328,7 @@
             aiOutput.style.display = 'block';
             aiOutput.innerHTML = '<div style="color:#d64242;">AI要約の取得に失敗しました</div>';
         });
-    });
-
-
+      });
 
       // AI設定モーダル
       openAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.add('is-visible'));
@@ -357,7 +359,6 @@
         }, 2500);
       }
     });
-    
-  </script>  
+  </script>
 </body>
 </html>
