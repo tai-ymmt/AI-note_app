@@ -8,12 +8,13 @@
 </head>
 <body>
 <div class="login-container">
-    <a href="/login"><div>戻る</div></a>
-    <h2>新規登録</h2>
+    <h2 class="access_page">新規登録</h2>
+    <p class="access_label">アカウントを作成してノートを管理しましょう</p>
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
-          <p style="color:red;">{{ message }}</p>
+          <p class="message">{{ message }}</p>
         {% endfor %}
       {% endif %}
     {% endwith %}
@@ -24,7 +25,7 @@
             {{ form.user_id.label }}<br>
             {{ form.user_id(size=20) }}<br>
             {% for error in form.user_id.errors %}
-                <span style="color:red;">{{ error }}</span>
+                <span class="message">{{ error }}</span>
             {% endfor %}
         </p>
 
@@ -32,21 +33,20 @@
             {{ form.password.label }}<br>
             {{ form.password(size=16) }}<br>
             {% for error in form.password.errors %}
-                <span style="color:red;">{{ error }}</span>
+                <span class="message">{{ error }}</span>
             {% endfor %}
         </p>
         <p>
             {{ form.confirm.label }}<br>
             {{ form.confirm(size=16) }}<br>
             {% for error in form.confirm.errors %}
-                <span style="color:red;">{{ error }}</span>
+                <span class="message">{{ error }}</span>
             {% endfor %}
         </p>
 
-        <p>{{form.submit()}}</p>
+        <p>{{form.submit(class="access_btn")}}</p>
     </form>
-    <p><a href="{{ url_for('newUser') }}">ログインはこちら</a></p>
-
+    <p class="access_label">アカウントをお持ちの方は<a href="{{ url_for('login') }}">こちら</a></p>
 </div>
 </body>
 </html>

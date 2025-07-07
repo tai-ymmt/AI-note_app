@@ -36,21 +36,23 @@ def login():
         user = User.query.filter_by(user_id=form.user_id.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash('ログインしました。')
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('index'))
+            return redirect(url_for('index'))
         else:
-            flash('ユーザーIDかパスワードが正しくありません。')
+            flash('ユーザーIDかパスワードが正しくありません。','danger')
             return redirect(url_for('login'))
 
     return render_template('login.html', form=form)
 
+#新規登録
 @app.route('/newUser', methods=['GET', 'POST'])
 def newUser():
     form = NewUserForm()
     if current_user.is_authenticated:
         return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
-
+    
+    if User.query.filter_by(user_id=form.user_id.data).first():
+        flash('そのユーザーIDは使用されています','danger')
+        return render_template('new_user.html', form=form)
     
     if form.validate_on_submit():
         # フォームの入力内容を元に新規ユーザー作成
@@ -63,7 +65,7 @@ def newUser():
         db.session.add(new_user)
         db.session.commit()
         
-        flash('ユーザー登録が完了しました。ログインしてください。')
+        flash('ユーザー登録が完了しました。ログインしてください。','danger')
         return redirect(url_for('login'))  # login ページにリダイレクト
     
     return render_template('new_user.html', form=form)
@@ -73,6 +75,8 @@ def newUser():
 @login_required
 def logout():
     logout_user()
+    flash('ログアウトしました。','success')
+
     return redirect(url_for('login'))
 
 #パスワード変更
@@ -84,19 +88,19 @@ def changePassword():
     if form.validate_on_submit():
         # 現在のパスワードチェック
         if not check_password_hash(current_user.password, form.now_password.data):
-            flash('現在のパスワードが正しくありません')
+            flash('現在のパスワードが正しくありません','danger')
             return render_template('change_pass.html', form=form)
         
         #現在と一致している場合エラー
-        if not check_password_hash(current_user.password, form.changed_password.data):
-            flash('新しいパスワードが現在のパスワードと同じです')
+        if check_password_hash(current_user.password, form.changed_password.data):
+            flash('新しいパスワードが現在のパスワードと同じです','danger')
             return render_template('change_pass.html', form=form)
         
         current_user.password = generate_password_hash(form.changed_password.data)
         db.session.commit()
         #遷移前にログアウト
         logout_user()
-        flash('パスワード変更しました。ログインしてください')
+        flash('パスワード変更しました。ログインしてください','success')
         return redirect(url_for('login'))
     
     return render_template('change_pass.html',form=form)
