@@ -4,9 +4,9 @@ CREATE TABLE IF NOT EXISTS users(
     num INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id varchar(20) NOT NULL UNIQUE KEY,
     password varchar(255) NOT NULL,
-    ai_level_flag INT(1) NOT NULL DEFAULT 1,
-    ai_answer_flag INT(1) NOT NULL DEFAULT 0,
-    mode_flag INT(1) NOT NULL DEFAULT 1
+    ai_level_flag INT NOT NULL DEFAULT 1,
+    ai_answer_flag INT NOT NULL DEFAULT 0,
+    mode_flag INT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS notes(
