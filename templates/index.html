@@ -54,7 +54,7 @@
             </thead>
             <today>
             {% for note in notes: %}
-            <tr id="hyou" onclick="location.href='/note'">
+            <tr id="hyou" onclick="location.href='/note/{{ note.num }}'">
                     <td style="text-align: left;" >{{ note.title }}</td>
                     <td style="text-align: left;">{{ note.update_time.strftime('%Y年%m月%d日') }}</td>
                     <td style="text-align: center;">
