@@ -23,21 +23,67 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+orders = ["新しい順", "古い順"]
 
-@app.route('/')
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    notes = Note.query.filter_by(user_num=current_user.num).order_by(Note.update_time.desc()).all()
-    #notes = Note.query.filter_by(user_num=current_user.num).order_by(Note.created.desc()).all()
-    return render_template('index.html', notes=notes, name=current_user.user_id)
+    notes = Note.query.all()
 
-@app.route('/note/create', methods=['POST'])
+    searchword = ""
+    order = "新しい順"
+
+    if request.method == "POST":
+        searchword = request.form.get("searchword")
+        order = request.form.get('order')
+    
+    if searchword:
+        if order == "新しい順":
+            notes = Note.query.filter((Note.user_num == current_user.num) & ((Note.title.like(f'%{searchword}%')) | (Note.content.like(f'%{searchword}%')))).order_by(Note.update_time.desc()).all()
+
+        elif order == "古い順":
+            notes = Note.query.filter((Note.user_num == current_user.num) & ((Note.title.like(f'%{searchword}%')) | (Note.content.like(f'%{searchword}%')))).order_by(Note.update_time.asc()).all()
+    else:
+        if order == "新しい順":
+            notes = Note.query.filter(Note.user_num == current_user.num).order_by(Note.update_time.desc()).all()
+        elif order == "古い順":
+            notes = Note.query.filter(Note.user_num == current_user.num).order_by(Note.update_time.asc()).all()
+    return render_template("index.html", searchword=searchword, orders=orders, notes=notes, len=len(notes),order=order)
+
+#新規ノート作成時
+@app.route('/note/new')
 @login_required
-def create_note():
-    note = Note(title="新しいノート", content="", user_num=current_user.num)
-    db.session.add(note)
+def new_note():
+    default_note = {
+        'title': '新しいノート',
+        'content': '',
+        'num': None  # 新規なので noteId はまだなし
+    }
+    return render_template('note.html', note=default_note)
+
+
+@app.route('/note/save', methods=['POST'])
+@login_required
+def save_note_new_or_edit():
+    data = request.json
+    note_id = data.get('note_id')
+    
+    # 既存ノートの更新
+    if note_id:
+        note = Note.query.get_or_404(note_id)
+        if note.user_num != current_user.num:
+            return jsonify({'error': '権限がありません'}), 403
+    else:
+        # 新規作成（ここで初めてDBに追加）
+        note = Note(user_num=current_user.num)
+        db.session.add(note)
+
+    note.title = data.get('title', '')
+    note.content = data.get('content', '')
+    note.update_time = datetime.utcnow()
     db.session.commit()
-    return jsonify({'note_id': note.num})
+    
+    return jsonify({'message': '保存しました', 'note_id': note.num})
 
 @app.route('/note/<int:note_id>')
 @login_required
