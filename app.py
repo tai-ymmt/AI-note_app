@@ -41,7 +41,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/settings')
+@app.route('/custom')
 def settings_page():
     return render_template('custom.html')
 

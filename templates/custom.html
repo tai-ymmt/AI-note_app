@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta chaeset="UTF-8">
+    <meta charset="UTF-8">
     <title>設定画面</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+
+<body class="custom-page">
     <header>
             {% include "header.html" %}
     </header>
@@ -27,18 +28,51 @@
         <section class="theme-setting">
             <h2>テーマ設定</h2>
             <p>アプリの表示テーマを設定できます</p>
-            <select id="theme-select">
-                <option value="light">ライトモード</option>
-                <option value="dark">ダークモード</option>
+            <label for="theme-select">明るさ設定：</label>
+            <select id="theme" name="mode_flag">
+                <option value="0" {% if current_user.mode_flag == 0 %}selected{% endif %}>ライトモード</option>
+                <option value="1" {% if current_user.mode_flag == 1 %}selected{% endif %}>ダークモード</option>
             </select>
         </section>
 
         <section class="AI-setting">
             <h2>AI設定(デフォルト)</h2>
             <p>AI機能の出力形式や言語レベルを設定できます</p>
+            <label for="response-mode">AI回答方法設定：</label>
+            <select id="response-mode" name="ai_answer_flag" >
+                <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
+                <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
+                <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
+            </select>
+            <label for="response-level">AI回答レベル設定：</label>
+            <select id="response-level" name="ai_level_flag">
+                <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初級</option>
+                <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>中級</option>
+                <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>上級</option>
+            </select>
         </section>
+        
+        <div class="button-group">
+            <button id="logout-btn">ログアウト</button>
+            <button id="save-setting">設定を保存</button>
+        </div>
     </main>
-<button id="logout-btn">ログアウト</button>
+
+<script>
+let selectedTheme = "{{ current_user.mode_flag }}"    
+document.getElementById('theme-select').addEventListener('change', function () {
+    const selected = this.value;
+
+    if (selected === "1") {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+    } else {
+        document.body.classList.remove('light-mode');
+        document.body.classList.add('dark-mode');   
+    }
+});
+</script>
+
 <script>
     document.getElementById("logout-btn").addEventListener("click", function() {
         if (confirm("本当にログアウトしますか？")) {
@@ -46,6 +80,5 @@
         }
     });
 </script>
-<button id="save-setting">設定を保存</button>
 </body>
 </html>
