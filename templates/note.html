@@ -50,6 +50,8 @@
     .welcome-icon { font-size: 1.5em; margin-bottom: 0.6em; color: #6c63ff; }
     .welcome-features { display: flex; gap: 1.15em; margin-top: 0.9em; flex-wrap: wrap; justify-content: center; }
     .feature-item { display: flex; align-items: center; gap: 0.35em; color: #bbb; font-size: 0.98em; }
+    
+    //トースト通知部分
     #toast {
       position: fixed; right: 32px; bottom: 32px;
       min-width: 180px;
@@ -89,19 +91,23 @@
   </style>
 </head>
 <body> 
-  {% include "header.html" %}   
-  <div class="top-bar">
+  {% include "header.html" %}   //header.htmlの読み込み
+  //トップバー
+  <div class="top-bar"> //ノート一覧に戻るボタン、保存ボタン、削除ボタン
     <button class="note-back-btn" id="back-btn"><i class="fas fa-arrow-left"></i> ノート一覧</button>
     <div class="top-bar-right">
       <button class="btn btn-save" id="save-note-btn"><i class="fas fa-save"></i> 保存</button>
       <button class="btn btn-delete" id="delete-note-btn"><i class="fas fa-trash-alt"></i> 削除</button>
     </div>
   </div>
-  <main class="main-content">
+  //編集領域
+  <main class="main-content"> //ノート編集（タイトル＋リッチテキストエディタ）
     <section class="editor-section">
       <div class="note-title-bar">
         <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
       </div>
+
+      //エディタツールバー
       <div class="editor-toolbar">
         <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
         <button class="toolbar-btn" data-command="italic" title="斜体"><i class="fas fa-italic"></i></button>
@@ -114,11 +120,27 @@
         <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
         <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
       </div>
+      //contenteditable="true" でリッチテキスト編集対応
+
+      //リッチエディタ本体
       <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
     </section>
-    <aside class="ai-sidebar">
-      <div class="sidebar-header"><span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span><button class="btn btn-ghost" id="open-ai-settings-btn"><i class="fas fa-cog"></i></button></div>
-      <div class="ai-search-section"><div class="search-input-wrapper"><input type="text" class="search-input" placeholder="検索したいキーワード"maxlength="20" required/><button class="search-btn"><i class="fas fa-search"></i></button></div></div>
+    <aside class="ai-sidebar"> //AI検索（Geminiによる要約/サジェスト）
+
+        //AIヘッダー
+      <div class="sidebar-header">
+        <span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span>
+        <button class="btn btn-ghost" id="open-ai-settings-btn"><i class="fas fa-cog"></i></button></div>
+
+        //AI検索欄
+      <div class="ai-search-section">
+        <div class="search-input-wrapper">
+            <input type="text" class="search-input" placeholder="検索したいキーワード"maxlength="20" required/>
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    AI結果表示欄
       <div class="ai-results">
         <div id="ai-loading" style="display: none; text-align:center;">
           <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
@@ -138,9 +160,11 @@
       
     </aside>
   </main>
+  
+  //AIトースト通知
+  <div id="toast"></div> 
 
-  <div id="toast"></div>
-
+  //AI詳細設定
   <div id="ai-settings-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost"><i class="fas fa-times"></i></button></div>
@@ -158,10 +182,15 @@
             <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
         </select>
     </div>
-    <div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label><textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea></div><div class="modal-actions"><button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button><button type="submit" class="btn btn-save">保存</button></div></form>
+    <div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label>
+        <textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea></div>
+    <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button>
+        <button type="submit" class="btn btn-save">保存</button></div></form>
     </div>
   </div>
 
+  //ノート削除確認
   <div id="delete-confirm-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -219,7 +248,7 @@
       // noteIdをJinja2のまま数値で渡す（重要！）
       const noteId = {{ note.num}};
 
-      // ===== イベントリスナーの登録 =====
+      // ===== ノート保存 =====
       backBtn.addEventListener('click', () => { window.location.href = '/'; });
       saveBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -234,7 +263,7 @@
         .then(data => showToast(data.message || 'ノートが保存されました'));
       });
 
-      // 削除ボタンの挙動をモーダル表示に変更
+      // ノート削除
       deleteNoteBtn.addEventListener('click', () => {
         deleteConfirmModal.classList.add('is-visible');
       });
@@ -318,7 +347,7 @@
         });
       });
 
-      // ===== 関数定義 =====
+      // ===== トースト通知 =====
       function showToast(message) {
         if (toastTimer) clearTimeout(toastTimer);
         toast.textContent = message;
