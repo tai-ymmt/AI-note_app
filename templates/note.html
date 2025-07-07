@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ノート編集 - AI Note App</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -247,8 +246,7 @@
       const deleteConfirmModal = document.getElementById('delete-confirm-modal');
       const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
       const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-      // noteIdをJinja2のまま数値で渡す（安全にtojsonで渡す）
-      const noteId = {{ note.num | tojson }};
+      const noteId = {{ note.num | tojson if note else 'null' }};
 
       // ===== ノート保存 =====
       backBtn.addEventListener('click', () => { window.location.href = '/'; });
@@ -256,15 +254,26 @@
         e.preventDefault();
         const title = document.querySelector('.note-title-input').value;
         const content = document.querySelector('.rich-editor').innerHTML;
-        fetch(`/note/${noteId}/save`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, content })
+
+        const url = noteId ? `/note/${noteId}/save` : `/note/save`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(noteId ? { title, content } : { title, content })
         })
         .then(res => res.json())
-        .then(data => showToast(data.message || 'ノートが保存されました'))
+        .then(data => {
+            showToast(data.message || 'ノートが保存されました');
+            if (!noteId && data.note_id) {
+                setTimeout(() => {
+                    window.location.href = `/note/${data.note_id}`;
+                }, 1200);
+            }
+        })
         .catch(() => showToast('ノートの保存に失敗しました'));
-      });
+        });
+
 
       // ノート削除
       deleteNoteBtn.addEventListener('click', () => {
