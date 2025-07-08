@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン</title>
+    <!-- Flask テンプレート（例: templates/index.html）内で -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+<div class="login-container">
+    <h2>ログイン</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="message">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+        <input type="text" name="username" placeholder="ユーザー名">
+        <input type="password" name="password" placeholder="パスワード">
+        <button type="submit">ログイン</button>
+    </form>
+</div>
+</body>
+</html>
