@@ -26,15 +26,23 @@
             <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="password" aria-hidden="true"></i>
         </p>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flashes">
-              {% for category, message in messages %}
-                <p class="flash-message {{ category }}">{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        <p>
+          {% for error in form.user_id.errors %}
+                <span class="message">{{ error }}</span>
+          {% endfor %}
+          {% for error in form.password.errors %}
+                <span class="message">{{ error }}</span>
+          {% endfor %}
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flashes">
+                {% for category, message in messages %}
+                  <p class="flash-message {{ category }}">{{ message }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+        </p>
         <p>{{ form.submit(class="access_btn") }}</p>
     </form>
     <p class="access_label">アカウントをお持ちでない方は<a href="{{ url_for('newUser') }}">こちら</a></p>

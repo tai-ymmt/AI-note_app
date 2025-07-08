@@ -123,13 +123,13 @@ def newUser():
     form = NewUserForm()
     if current_user.is_authenticated:
         return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
-    
-    if User.query.filter_by(user_id=form.user_id.data).first():
-        flash('そのユーザーIDは使用されています','danger')
-        return render_template('new_user.html', form=form)
-    
+        
     if form.validate_on_submit():
         # フォームの入力内容を元に新規ユーザー作成
+        if User.query.filter_by(user_id=form.user_id.data).first():
+            flash('そのユーザーIDは使用されています','danger')
+            return redirect(url_for('newUser'))
+
         hashed_password = form.get_hashed_password()  # ハッシュ化されたパスワードを取得
 
         new_user = User(
@@ -139,8 +139,12 @@ def newUser():
         db.session.add(new_user)
         db.session.commit()
         
-        flash('ユーザー登録が完了しました。ログインしてください。','danger')
+        flash('ユーザー登録が完了しました。ログインしてください。','success')
         return redirect(url_for('login'))  # login ページにリダイレクト
+    
+    
+    form.user_id.data = ''  # 中身をクリア
+
     
     return render_template('new_user.html', form=form)
 

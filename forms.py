@@ -60,6 +60,7 @@ class LoginForm(FlaskForm):
         DataRequired(),
         Length(min=8, max=16, message='パスワードは8文字以上で入力してください')
     ],
+    
     render_kw={"placeholder": "半角英数字で8文字以上で入力してください"}
     )
 
