@@ -10,7 +10,6 @@ body {
 
 /*ユーザー情報入力ページデザイン*/
 body.login_body {
-
     display: flex;
     justify-content: center;
     align-items: center;
