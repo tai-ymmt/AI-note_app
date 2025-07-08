@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <title>ノート編集 - AI Note App</title>
-
+  <!-- ローカルCSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+  <!-- Google FontsとFontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+  <!-- ヘッダー -->
   {% include "header.html" %}
 
+  <!-- 1. トップバー（戻る・保存・削除） -->
   <div class="top-bar">
     <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
     <div class="top-bar-right">
@@ -20,11 +22,15 @@
     </div>
   </div>
   
+  <!-- 2. メイン2カラム（左：エディタ、右：AI） -->
   <main class="main-content">
+    <!-- 左：ノート編集 -->
     <section class="editor-section">
       <div class="note-title-bar">
+        <!-- タイトル入力 -->
         <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
       </div>
+      <!-- ツールバー（装飾ボタン） -->
       <div class="editor-toolbar">
         <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
         <button class="toolbar-btn" data-command="italic" title="斜体"><i class="fas fa-italic"></i></button>
@@ -37,19 +43,23 @@
         <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
         <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
       </div>
+      <!-- リッチエディタ -->
       <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
     </section>
+    <!-- 右：AIサイドバー -->
     <aside class="ai-sidebar">
       <div class="sidebar-header">
         <span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span>
         <button class="btn btn-ghost" id="open-ai-settings-btn" aria-label="AI詳細設定"><i class="fas fa-cog"></i></button>
       </div>
+      <!-- AI検索入力 -->
       <div class="ai-search-section">
         <div class="search-input-wrapper">
           <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="20" required />
           <button class="search-btn" aria-label="AI検索"><i class="fas fa-search"></i></button>
         </div>
       </div>
+      <!-- AI検索結果エリア -->
       <div class="ai-results">
         <div id="ai-loading" style="display: none; text-align:center;">
           <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
@@ -69,9 +79,12 @@
     </aside>
   </main>
   
+  <!-- 3. トースト通知（どの画面でも一番手前で表示） -->
   <div id="toast"></div>
 
-  <!-- ノート未保存警告モーダル -->
+  <!-- 4. 各種モーダルはページ最後でまとめて管理 -->
+
+  <!-- 未保存警告 -->
   <div id="unsaved-confirm-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -89,8 +102,7 @@
       </div>
     </div>
   </div>
-
-  <!-- ノート削除確認モーダル -->
+  <!-- 削除確認 -->
   <div id="delete-confirm-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -107,20 +119,24 @@
       </div>
     </div>
   </div>
-
-  <!-- AI詳細設定モーダル（省略せず） -->
+  <!-- AI詳細設定 -->
   <div id="ai-settings-modal" class="modal-outer">
     <div class="modal-inner">
-      <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost" aria-label="閉じる"><i class="fas fa-times"></i></button></div>
+      <div class="modal-header">
+        <span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span>
+        <button id="close-ai-settings-btn" class="btn-ghost" aria-label="閉じる"><i class="fas fa-times"></i></button>
+      </div>
       <form id="ai-settings-form">
-        <div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
+        <div class="modal-form-group">
+          <label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
           <select id="output-format" class="modal-select">
             <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
             <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
             <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
           </select>
         </div>
-        <div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
+        <div class="modal-form-group">
+          <label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
           <select id="target-level" class="modal-select">
             <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
             <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
@@ -135,9 +151,33 @@
     </div>
   </div>
 
+  <!-- 5. JavaScript（機能順にブロック化） -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ===== ツールバー（太字など） =====
+      // ====== グローバル変数定義 ======
+      const saveBtn = document.getElementById('save-note-btn');
+      const backBtn = document.getElementById('back-btn');
+      const toast = document.getElementById('toast');
+      let toastTimer = null;
+      const aiSettingsModal = document.getElementById('ai-settings-modal');
+      const openAiSettingsBtn = document.getElementById('open-ai-settings-btn');
+      const closeAiSettingsBtn = document.getElementById('close-ai-settings-btn');
+      const cancelAiSettingsBtn = document.getElementById('cancel-ai-settings-btn');
+      const aiSettingsForm = document.getElementById('ai-settings-form');
+      const deleteNoteBtn = document.getElementById('delete-note-btn');
+      const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+      const noteId = {{ note.num | tojson if note else 'null' }};
+      const titleInput = document.querySelector('.note-title-input');
+      const contentEditor = document.querySelector('.rich-editor');
+      const unsavedConfirmModal = document.getElementById('unsaved-confirm-modal');
+      const cancelUnsavedBtn = document.getElementById('cancel-unsaved-btn');
+      const confirmUnsavedBtn = document.getElementById('confirm-unsaved-btn');
+      let isEdited = false;
+      let pendingBack = false;
+
+      // ====== エディタツールバー処理 ======
       document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
@@ -154,24 +194,24 @@
           updateToolbarState();
         });
       });
+      // 装飾状態の反映
       function updateToolbarState() {
-          const editor = document.querySelector('.rich-editor');
-          const commandMap = {
-            bold: 'bold',
-            italic: 'italic',
-            underline: 'underline',
-            insertOrderedList: 'insertOrderedList',
-            insertUnorderedList: 'insertUnorderedList'
-          };
-          Object.entries(commandMap).forEach(([cmd, query]) => {
-            const btn = document.querySelector(`.toolbar-btn[data-command=\"${cmd}\"]`);
-            if (!btn) return;
-            if (document.queryCommandState(query)) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-          });
+        const commandMap = {
+          bold: 'bold',
+          italic: 'italic',
+          underline: 'underline',
+          insertOrderedList: 'insertOrderedList',
+          insertUnorderedList: 'insertUnorderedList'
+        };
+        Object.entries(commandMap).forEach(([cmd, query]) => {
+          const btn = document.querySelector(`.toolbar-btn[data-command=\"${cmd}\"]`);
+          if (!btn) return;
+          if (document.queryCommandState(query)) {
+              btn.classList.add('active');
+          } else {
+              btn.classList.remove('active');
+          }
+        });
       }
       const richEditor = document.querySelector('.rich-editor');
       ['keyup', 'mouseup', 'click'].forEach(evt => {
@@ -179,77 +219,18 @@
       });
       updateToolbarState();
 
-      // ===== DOM要素 =====
-      const saveBtn = document.getElementById('save-note-btn');
-      const backBtn = document.getElementById('back-btn');
-      const toast = document.getElementById('toast');
-      let toastTimer = null;
-
-      const aiSettingsModal = document.getElementById('ai-settings-modal');
-      const openAiSettingsBtn = document.getElementById('open-ai-settings-btn');
-      const closeAiSettingsBtn = document.getElementById('close-ai-settings-btn');
-      const cancelAiSettingsBtn = document.getElementById('cancel-ai-settings-btn');
-      const aiSettingsForm = document.getElementById('ai-settings-form');
-      
-      const deleteNoteBtn = document.getElementById('delete-note-btn');
-      const deleteConfirmModal = document.getElementById('delete-confirm-modal');
-      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-      const noteId = {{ note.num | tojson if note else 'null' }};
-      const titleInput = document.querySelector('.note-title-input');
-      const contentEditor = document.querySelector('.rich-editor');
-
-      // ===== 未保存警告モーダル =====
-      const unsavedConfirmModal = document.getElementById('unsaved-confirm-modal');
-      const cancelUnsavedBtn = document.getElementById('cancel-unsaved-btn');
-      const confirmUnsavedBtn = document.getElementById('confirm-unsaved-btn');
-      let isEdited = false;
-      let pendingBack = false;
-
+      // ====== ノート入力監視（未保存管理） ======
       if (titleInput && contentEditor) {
         titleInput.addEventListener('input', () => isEdited = true);
         contentEditor.addEventListener('input', () => isEdited = true);
       }
 
-      backBtn.addEventListener('click', (e) => {
-        if (isEdited) {
-          e.preventDefault();
-          pendingBack = true;
-          unsavedConfirmModal.classList.add('is-visible');
-          return;
-        }
-        window.location.href = '/';
-      });
-
-      cancelUnsavedBtn.addEventListener('click', () => {
-        pendingBack = false;
-        unsavedConfirmModal.classList.remove('is-visible');
-      });
-
-      confirmUnsavedBtn.addEventListener('click', () => {
-        unsavedConfirmModal.classList.remove('is-visible');
-        if (pendingBack) {
-          window.location.href = '/';
-          pendingBack = false;
-        }
-      });
-
-      unsavedConfirmModal.addEventListener('click', (e) => {
-        if (e.target === unsavedConfirmModal) {
-          pendingBack = false;
-          unsavedConfirmModal.classList.remove('is-visible');
-        }
-      });
-
-      function markSaved() { isEdited = false; }
-
-      // ===== ノート保存 =====
+      // ====== ノート保存処理 ======
       saveBtn.addEventListener('click', (e) => {
         e.preventDefault();
         const title = titleInput.value;
         const content = contentEditor.innerHTML;
         const url = noteId ? `/note/${noteId}/save` : `/note/save`;
-
         fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -258,7 +239,7 @@
         .then(res => res.json())
         .then(data => {
             showToast(data.message || 'ノートが保存されました');
-            markSaved();
+            isEdited = false;
             if (!noteId && data.note_id) {
               setTimeout(() => {
                 window.location.href = `/note/${data.note_id}`;
@@ -268,7 +249,7 @@
         .catch(() => showToast('ノートの保存に失敗しました'));
       });
 
-      // ===== ノート削除 =====
+      // ====== ノート削除処理 ======
       deleteNoteBtn.addEventListener('click', () => {
         deleteConfirmModal.classList.add('is-visible');
       });
@@ -285,18 +266,16 @@
           .catch(() => showToast('ノートの削除に失敗しました'));
         deleteConfirmModal.classList.remove('is-visible');
       });
-      
-      // ===== AI検索ボタン =====
+
+      // ====== AI検索ボタン ======
       document.querySelector('.search-btn').addEventListener('click', () => {
         const keyword = document.querySelector('.search-input').value;
         const aiLoading = document.getElementById('ai-loading');
         const aiOutput = document.getElementById('ai-output');
         const aiWelcome = document.getElementById('ai-welcome');
-
         aiLoading.style.display = 'block';
         aiOutput.style.display = 'none';
         aiWelcome.style.display = 'none';
-
         fetch('/api/ai_search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -318,7 +297,7 @@
                 const aiOutputText = document.getElementById('ai-output-text').innerText;
                 const editor = document.querySelector('.rich-editor');
                 editor.innerHTML += `<br>${aiOutputText}`;
-                isEdited = true; // AI貼り付けも編集扱い
+                isEdited = true;
                 showToast('AI出力をノートに貼り付けました');
             });
         })
@@ -329,7 +308,35 @@
         });
       });
 
-      // ===== AI設定モーダル =====
+      // ====== 未保存警告モーダル処理 ======
+      backBtn.addEventListener('click', (e) => {
+        if (isEdited) {
+          e.preventDefault();
+          pendingBack = true;
+          unsavedConfirmModal.classList.add('is-visible');
+          return;
+        }
+        window.location.href = '/';
+      });
+      cancelUnsavedBtn.addEventListener('click', () => {
+        pendingBack = false;
+        unsavedConfirmModal.classList.remove('is-visible');
+      });
+      confirmUnsavedBtn.addEventListener('click', () => {
+        unsavedConfirmModal.classList.remove('is-visible');
+        if (pendingBack) {
+          window.location.href = '/';
+          pendingBack = false;
+        }
+      });
+      unsavedConfirmModal.addEventListener('click', (e) => {
+        if (e.target === unsavedConfirmModal) {
+          pendingBack = false;
+          unsavedConfirmModal.classList.remove('is-visible');
+        }
+      });
+
+      // ====== AI詳細設定モーダル ======
       openAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.add('is-visible'));
       closeAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
       cancelAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
@@ -346,7 +353,7 @@
         });
       });
 
-      // ===== トースト通知 =====
+      // ====== トースト通知表示関数 ======
       function showToast(message) {
         if (toastTimer) clearTimeout(toastTimer);
         toast.textContent = message;
