@@ -11,7 +11,7 @@ class NewUserForm(FlaskForm):
     user_id = StringField('ユーザーID', validators=[
         DataRequired(),
         Length(max=20),
-        Regexp(r'^[a-zA-Z0-9]+$', message='ユーザー名は半角英数字のみ使用できます。')
+        Regexp(r'^[a-zA-Z0-9]+$', message='使用できない文字が含まれています')
 
     ],
     render_kw={"placeholder": "半角英数字で入力してください"}
@@ -22,7 +22,7 @@ class NewUserForm(FlaskForm):
         Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください'),
         Regexp(
             r'^[a-zA-z0-9]+$',
-            message='パスワードは半角英数字のみで作成してください'
+            message='使用できない文字が含まれています'
         )
     ],
     render_kw={"placeholder": "半角英数字で8~16文字で入力してください"}
@@ -41,7 +41,7 @@ class NewUserForm(FlaskForm):
 #登録されているかチェック
     def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
-            raise ValidationError('このユーザー名はすでに使用されています')
+            raise ValidationError('既に使用されているユーザーIDです')
         
 #パスワードハッシュ化処理
     def get_hashed_password(self):
@@ -84,7 +84,7 @@ class ChangePasswordForm(FlaskForm):
         Length(min=8, max=16, message='パスワードは8文字以上16文字以下で入力してください。'),
         Regexp(
             r'^[a-zA-Z0-9]+$',
-            message='パスワードは半角英数字のみで作成してください'
+            message='使用できない文字が含まれています'
             )
     ],
     render_kw={"placeholder": "新しいパスワードを入力してください"}

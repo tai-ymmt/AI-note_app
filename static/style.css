@@ -1,16 +1,20 @@
 /*共通デザイン*/
 body {
-    font-family: 'Inter', 'Noto Sans JP', sans-serif; color: #222;
+    margin: 0;
+    padding: 0; 
     background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
-    color: #222;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    color: #222; min-height: 100vh; position: relative; 
+}
+
+/*ユーザー情報入力ページデザイン*/
+body.login_body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
-
-/*ユーザー情報入力ページデザイン*/
 .login-container {
     background: white;
     padding: 30px 40px;
@@ -53,14 +57,29 @@ body {
      text-align: left;
      font-size: 12px;
 }
-
-input[type="text"],
-input[type="password"] {
+.acces_area {
     width: 100%;
-    padding: 10px;
+    padding: 10px 5px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+/* 入力欄に被らないようにアイコンを配置 */
+.password-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* アイコンの位置 */
+.toggle-icon {
+  position: absolute;
+  top: 70%;
+  right: 0;
+  transform: translateY(-125%);
+  cursor: pointer;
+  color: #888;
 }
 
 /*エラーメッセージ対応*/
@@ -78,3 +97,16 @@ input[type="password"] {
  .flash-message.danger {
      color: red; 
 }
+
+/* ブラウザのデフォルトアイコン非表示 */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}
+
