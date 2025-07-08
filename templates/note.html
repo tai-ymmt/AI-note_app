@@ -3,97 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>ノート編集 - AI Note App</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body { margin: 0; padding: 0; background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%); font-family: 'Inter', 'Noto Sans JP', sans-serif; color: #222; min-height: 100vh; position: relative; }
-    .top-bar { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; max-width: 1400px; margin: 2.5rem auto 0 auto; padding: 0 2rem; box-sizing: border-box; position: relative; z-index: 10; }
-    .note-back-btn { background: #fff; border: none; color: #857be7; font-size: 1.1rem; display: flex; align-items: center; gap: .45em; font-weight: 600; cursor: pointer; padding: 0.3em 1.3em 0.3em 0.3em; border-radius: 5px; transition: background .14s, color .14s; box-shadow: 0 2px 8px rgba(130,120,250,0.05); }
-    .note-back-btn:hover { background: #f4f3fd; color: #594cf5; }
-    .top-bar-right { display: flex; gap: 0.9em; }
-    .btn { display: inline-flex; align-items: center; gap: 0.35em; border: none; border-radius: 6px; padding: 0.55em 1.3em; font-weight: 600; font-size: 1rem; cursor: pointer; background: none; transition: background 0.15s, color 0.15s; box-shadow: 0 1px 4px rgba(108,99,255,0.08); }
-    .btn-save { background: #6c63ff; color: #fff; }
-    .btn-save:hover { background: #594cf5; }
-    .btn-delete { background: #fff1f1; color: #d64242; border: 1px solid #fad1d1; }
-    .btn-delete:hover { background: #ffd6d6; color: #ab1d1d; }
-    .btn-ghost { background: none; color: #6c63ff; box-shadow: none; padding: 0.4em; font-size: 1.2rem; }
-    .btn-ghost:hover { background: #f4f3fd; color: #594cf5; }
-    .main-content { display: flex; gap: 2.4rem; max-width: 1400px; margin: 1.5rem auto 0 auto; padding: 0 2rem 2rem 2rem; min-height: 80vh; align-items: flex-start; }
-    .editor-section { flex: 1 1 0; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(120,120,180,0.09); padding: 2.5rem 2.5rem 2.3rem 2.5rem; display: flex; flex-direction: column; min-width: 0; }
-    .note-title-bar { border-bottom: 2px solid #eceafd; margin-bottom: 1.3em; padding-bottom: 0.7em; }
-    .note-title-input { font-size: 2.1rem; font-weight: 700; border: none; background: transparent; outline: none; color: #222243; width: 100%; letter-spacing: 0.02em; }
-    .note-title-input::placeholder { color: #b6b8d1; font-weight: 400; font-size: 1.2rem; }
-    .editor-toolbar { display: flex; gap: 8px; background: #f8f8fe; border-radius: 8px; padding: 0.5rem 0.7rem; margin-bottom: 1.4rem; border: 1px solid #eceafd; flex-wrap: wrap; }
-    .toolbar-btn { background: none; border: none; color: #2a2847; font-size: 1.13em; padding: 0.22em 0.55em; border-radius: 4px; cursor: pointer; transition: background 0.14s, color 0.14s; }
-    .toolbar-btn:hover { background: #6c63ff; color: #fff; }
-    .toolbar-btn.active {
-      border: 2px solid #6c63ff;
-      background: #eceafd;
-      color: #6c63ff;
-      box-shadow: 0 2px 8px rgba(108,99,255,0.09);
-    }
-    .toolbar-separator { border-left: 1px solid #eceafd; height: 20px; margin: auto 7px; }
-    .rich-editor { min-height: 320px; max-height: 540px; outline: none; border: none; font-size: 1.17em; padding: 1.1rem 0 0.5rem 0; line-height: 1.7; color: #222243; background: none; resize: vertical; overflow: auto; }
-    .rich-editor:empty::before { content: attr(data-placeholder); color: #b9b8d5; font-size: 1em; font-style: italic; pointer-events: none; }
-    .ai-sidebar { width: 340px; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(120,120,180,0.13); padding: 2rem 1.6rem; display: flex; flex-direction: column; gap: 1.4rem; min-width: 270px; align-self: flex-start; }
-    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
-    .sidebar-title { font-size: 1.18rem; font-weight: 700; color: #594cf5; display: flex; align-items: center; gap: 0.55em; }
-    .ai-search-section { margin-bottom: 0.7rem; }
-    .search-input-wrapper { display: flex; gap: 0.4rem; margin-bottom: 0.7rem; }
-    .search-input { flex: 1 1 0; font-size: 1em; padding: 0.55em 1em; border-radius: 7px; border: 1px solid #eceafd; background: #f6f7fb; outline: none; transition: border 0.18s; }
-    .search-input:focus { border: 1.5px solid #6c63ff; }
-    .search-btn { background: #6c63ff; color: #fff; border: none; padding: 0.45em 1em; border-radius: 7px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .search-btn:hover { background: #594cf5; }
-    .ai-results { background: #f8f8fe; border-radius: 8px; padding: 1.1rem; min-height: 130px; color: #656579; font-size: 0.99em; }
-    .welcome-message { display: flex; flex-direction: column; align-items: center; color: #888; text-align: center; }
-    .welcome-icon { font-size: 1.5em; margin-bottom: 0.6em; color: #6c63ff; }
-    .welcome-features { display: flex; gap: 1.15em; margin-top: 0.9em; flex-wrap: wrap; justify-content: center; }
-    .feature-item { display: flex; align-items: center; gap: 0.35em; color: #bbb; font-size: 0.98em; }
-    
-    
-    #toast {
-      position: fixed; right: 32px; bottom: 32px;
-      min-width: 180px;
-      background: rgba(50,50,75,0.95);
-      color: #fff;
-      font-weight: 600;
-      border-radius: 9px;
-      box-shadow: 0 6px 20px rgba(60,45,100,0.14);
-      padding: 1em 1.7em;
-      font-size: 1.08rem;
-      text-align: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.4s, visibility 0s 0.4s;
-    }
-    #toast.is-visible {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-      transition: opacity 0.4s;
-    }
-
-    .modal-outer { display: none; position: fixed; left:0; top:0; width:100vw; height:100vh; background: rgba(40,30,55,0.17); z-index:99999; align-items: center; justify-content: center; }
-    .modal-outer.is-visible { display: flex; }
-    .modal-inner { background:#fff; border-radius:15px; min-width:320px; max-width:96vw; box-shadow:0 6px 28px rgba(80,60,130,0.12); padding:2.1em 2em 1.3em 2em; margin:auto; position:relative; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3em; }
-    .modal-title { font-size: 1.22rem; font-weight: 700; color: #6c63ff; }
-    .modal-form-group { margin-bottom: 1.1em; }
-    .modal-label { font-weight: 600; color: #594cf5; display: block; margin-bottom: 0.3em; }
-    .modal-select, .modal-textarea { width: 100%; box-sizing: border-box; font-size: 1em; padding: 0.5em 0.7em; border-radius: 7px; border: 1px solid #eceafd; background: #f8f8fe; }
-    .modal-textarea { resize: vertical; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 1em; margin-top: 2em; }
-    @media (max-width: 1100px) { .main-content { flex-direction: column; gap: 1.3rem; align-items: stretch; } .ai-sidebar, .editor-section { width: 100%; max-width: none; align-self: stretch; } .top-bar { padding: 0 1rem; } }
-    @media (max-width: 700px) { .main-content, .top-bar { padding: 0 0.5rem; } .editor-section, .ai-sidebar { padding: 1.5rem 1rem; } .note-title-input { font-size: 1.5rem; } .modal-inner { min-width: 90vw; padding: 1.5em 1em; } }
-  </style>
 </head>
 <body>
-  <!-- header.htmlの読み込み -->
   {% include "header.html" %}
 
-  <!-- トップバー：ノート一覧に戻るボタン、保存ボタン、削除ボタン -->
   <div class="top-bar">
     <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
     <div class="top-bar-right">
@@ -102,13 +20,11 @@
     </div>
   </div>
   
-  <!-- 編集領域：ノート編集（タイトル＋リッチテキストエディタ） -->
   <main class="main-content">
     <section class="editor-section">
       <div class="note-title-bar">
         <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
       </div>
-      <!-- エディタツールバー -->
       <div class="editor-toolbar">
         <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
         <button class="toolbar-btn" data-command="italic" title="斜体"><i class="fas fa-italic"></i></button>
@@ -121,24 +37,19 @@
         <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
         <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
       </div>
-      <!-- リッチエディタ本体 -->
       <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
     </section>
-    <!-- AI検索（Geminiによる要約/サジェスト） -->
     <aside class="ai-sidebar">
-      <!-- AIヘッダー -->
       <div class="sidebar-header">
         <span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span>
         <button class="btn btn-ghost" id="open-ai-settings-btn" aria-label="AI詳細設定"><i class="fas fa-cog"></i></button>
       </div>
-      <!-- AI検索欄 -->
       <div class="ai-search-section">
         <div class="search-input-wrapper">
           <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="20" required />
           <button class="search-btn" aria-label="AI検索"><i class="fas fa-search"></i></button>
         </div>
       </div>
-      <!-- AI結果表示欄 -->
       <div class="ai-results">
         <div id="ai-loading" style="display: none; text-align:center;">
           <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
@@ -158,36 +69,24 @@
     </aside>
   </main>
   
-  <!-- AIトースト通知 -->
   <div id="toast"></div>
 
-  <!-- AI詳細設定モーダル -->
-  <div id="ai-settings-modal" class="modal-outer">
+  <!-- ノート未保存警告モーダル -->
+  <div id="unsaved-confirm-modal" class="modal-outer">
     <div class="modal-inner">
-      <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost" aria-label="閉じる"><i class="fas fa-times"></i></button></div>
-      <form id="ai-settings-form">
-        <div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
-          <select id="output-format" class="modal-select">
-            <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
-            <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
-            <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
-          </select>
-        </div>
-        <div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
-          <select id="target-level" class="modal-select">
-            <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
-            <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
-            <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
-          </select>
-        </div>
-        <div class="modal-form-group"><label for="custom-prompt" class="modal-label"><i class="fas fa-edit"></i> 追加指示（オプション）</label>
-          <textarea id="custom-prompt" rows="3" class="modal-textarea"></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button>
-          <button type="submit" class="btn btn-save">保存</button>
-        </div>
-      </form>
+      <div class="modal-header">
+        <span class="modal-title" style="color: #f9a825;"><i class="fas fa-exclamation-circle"></i> 変更を破棄</span>
+      </div>
+      <div class="modal-body">
+        <p style="margin: 1em 0 2em; line-height: 1.6;">
+          保存されていない変更があります。<br>
+          破棄してノート一覧に戻りますか？
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-unsaved-btn">キャンセル</button>
+        <button type="button" class="btn btn-delete" id="confirm-unsaved-btn">破棄して戻る</button>
+      </div>
     </div>
   </div>
 
@@ -209,9 +108,36 @@
     </div>
   </div>
 
+  <!-- AI詳細設定モーダル（省略せず） -->
+  <div id="ai-settings-modal" class="modal-outer">
+    <div class="modal-inner">
+      <div class="modal-header"><span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span><button id="close-ai-settings-btn" class="btn-ghost" aria-label="閉じる"><i class="fas fa-times"></i></button></div>
+      <form id="ai-settings-form">
+        <div class="modal-form-group"><label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
+          <select id="output-format" class="modal-select">
+            <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
+            <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
+            <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
+          </select>
+        </div>
+        <div class="modal-form-group"><label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
+          <select id="target-level" class="modal-select">
+            <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
+            <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
+            <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button>
+          <button type="submit" class="btn btn-save">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ===== ツールバーボタン機能を追加 =====
+      // ===== ツールバー（太字など） =====
       document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
@@ -225,57 +151,124 @@
           } else {
             document.execCommand(command, false, value);
           }
+          updateToolbarState();
         });
       });
+      function updateToolbarState() {
+          const editor = document.querySelector('.rich-editor');
+          const commandMap = {
+            bold: 'bold',
+            italic: 'italic',
+            underline: 'underline',
+            insertOrderedList: 'insertOrderedList',
+            insertUnorderedList: 'insertUnorderedList'
+          };
+          Object.entries(commandMap).forEach(([cmd, query]) => {
+            const btn = document.querySelector(`.toolbar-btn[data-command=\"${cmd}\"]`);
+            if (!btn) return;
+            if (document.queryCommandState(query)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+          });
+      }
+      const richEditor = document.querySelector('.rich-editor');
+      ['keyup', 'mouseup', 'click'].forEach(evt => {
+        richEditor.addEventListener(evt, updateToolbarState);
+      });
+      updateToolbarState();
 
-      // ===== DOM要素の取得 =====
+      // ===== DOM要素 =====
       const saveBtn = document.getElementById('save-note-btn');
       const backBtn = document.getElementById('back-btn');
       const toast = document.getElementById('toast');
       let toastTimer = null;
 
-      // AI設定モーダル関連
       const aiSettingsModal = document.getElementById('ai-settings-modal');
       const openAiSettingsBtn = document.getElementById('open-ai-settings-btn');
       const closeAiSettingsBtn = document.getElementById('close-ai-settings-btn');
       const cancelAiSettingsBtn = document.getElementById('cancel-ai-settings-btn');
       const aiSettingsForm = document.getElementById('ai-settings-form');
       
-      // 削除関連の要素を取得
       const deleteNoteBtn = document.getElementById('delete-note-btn');
       const deleteConfirmModal = document.getElementById('delete-confirm-modal');
       const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
       const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
       const noteId = {{ note.num | tojson if note else 'null' }};
+      const titleInput = document.querySelector('.note-title-input');
+      const contentEditor = document.querySelector('.rich-editor');
+
+      // ===== 未保存警告モーダル =====
+      const unsavedConfirmModal = document.getElementById('unsaved-confirm-modal');
+      const cancelUnsavedBtn = document.getElementById('cancel-unsaved-btn');
+      const confirmUnsavedBtn = document.getElementById('confirm-unsaved-btn');
+      let isEdited = false;
+      let pendingBack = false;
+
+      if (titleInput && contentEditor) {
+        titleInput.addEventListener('input', () => isEdited = true);
+        contentEditor.addEventListener('input', () => isEdited = true);
+      }
+
+      backBtn.addEventListener('click', (e) => {
+        if (isEdited) {
+          e.preventDefault();
+          pendingBack = true;
+          unsavedConfirmModal.classList.add('is-visible');
+          return;
+        }
+        window.location.href = '/';
+      });
+
+      cancelUnsavedBtn.addEventListener('click', () => {
+        pendingBack = false;
+        unsavedConfirmModal.classList.remove('is-visible');
+      });
+
+      confirmUnsavedBtn.addEventListener('click', () => {
+        unsavedConfirmModal.classList.remove('is-visible');
+        if (pendingBack) {
+          window.location.href = '/';
+          pendingBack = false;
+        }
+      });
+
+      unsavedConfirmModal.addEventListener('click', (e) => {
+        if (e.target === unsavedConfirmModal) {
+          pendingBack = false;
+          unsavedConfirmModal.classList.remove('is-visible');
+        }
+      });
+
+      function markSaved() { isEdited = false; }
 
       // ===== ノート保存 =====
-      backBtn.addEventListener('click', () => { window.location.href = '/'; });
       saveBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        const title = document.querySelector('.note-title-input').value;
-        const content = document.querySelector('.rich-editor').innerHTML;
-
+        const title = titleInput.value;
+        const content = contentEditor.innerHTML;
         const url = noteId ? `/note/${noteId}/save` : `/note/save`;
 
         fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(noteId ? { title, content } : { title, content })
+            body: JSON.stringify({ title, content })
         })
         .then(res => res.json())
         .then(data => {
             showToast(data.message || 'ノートが保存されました');
+            markSaved();
             if (!noteId && data.note_id) {
-                setTimeout(() => {
-                    window.location.href = `/note/${data.note_id}`;
-                }, 1200);
+              setTimeout(() => {
+                window.location.href = `/note/${data.note_id}`;
+              }, 1200);
             }
         })
         .catch(() => showToast('ノートの保存に失敗しました'));
-        });
+      });
 
-
-      // ノート削除
+      // ===== ノート削除 =====
       deleteNoteBtn.addEventListener('click', () => {
         deleteConfirmModal.classList.add('is-visible');
       });
@@ -293,14 +286,13 @@
         deleteConfirmModal.classList.remove('is-visible');
       });
       
-      // AI検索ボタン
+      // ===== AI検索ボタン =====
       document.querySelector('.search-btn').addEventListener('click', () => {
         const keyword = document.querySelector('.search-input').value;
         const aiLoading = document.getElementById('ai-loading');
         const aiOutput = document.getElementById('ai-output');
         const aiWelcome = document.getElementById('ai-welcome');
 
-        // ローディング表示ON、他を消す
         aiLoading.style.display = 'block';
         aiOutput.style.display = 'none';
         aiWelcome.style.display = 'none';
@@ -322,13 +314,11 @@
                 <button id="paste-to-note-btn" class="btn btn-save" style="margin-top: 0.4em;"><i class="fas fa-clipboard"></i> 貼り付け</button>
             `;
             aiOutput.style.display = 'block';
-
-            // ペーストボタンにイベント付与
             document.getElementById('paste-to-note-btn').addEventListener('click', () => {
                 const aiOutputText = document.getElementById('ai-output-text').innerText;
                 const editor = document.querySelector('.rich-editor');
-                // ここでinnerTextにしているのでHTMLタグが混じらない形
                 editor.innerHTML += `<br>${aiOutputText}`;
+                isEdited = true; // AI貼り付けも編集扱い
                 showToast('AI出力をノートに貼り付けました');
             });
         })
@@ -339,7 +329,7 @@
         });
       });
 
-      // AI設定モーダル
+      // ===== AI設定モーダル =====
       openAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.add('is-visible'));
       closeAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
       cancelAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
@@ -348,8 +338,6 @@
         aiSettingsModal.classList.remove('is-visible');
         showToast('AI設定を保存しました');
       });
-      
-      // モーダル背景クリックで閉じる処理 (共通化)
       [aiSettingsModal, deleteConfirmModal].forEach(modal => {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) {
