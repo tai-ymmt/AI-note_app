@@ -2,14 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
-from models import db, User, Note
+from models import db, User, Note #本田　この末尾に「Note」を追加するのは忘れないで
 from datetime import datetime
-
-# # AI用
-# from google import genai
-# GENAI_API_KEY = "AIzaSyCjjC-YoxhZIzNlCfznMeKQg138BptwDHU"
-# client = genai.Client(api_key=GENAI_API_KEY)
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -26,23 +20,13 @@ def load_user(user_id):
 @login_required
 def index():
     return render_template('index.html', name=current_user.user_id)
+# これより上は他の人のに合わせて
+# ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓本田ノート一覧画面　オリジナル部分↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
+# 並び替えプルダウンの中身
 orders = ["新しい順", "古い順"]
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        user_id = request.form.get('username')
-        password = request.form.get('password')
-        user = User.query.filter_by(user_id=user_id).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('index'))
-        else:
-            flash('ログイン情報が正しくありません。')
-    return render_template('login.html')
-
-
+# ノート一覧画面
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
@@ -68,6 +52,7 @@ def index():
             notes = Note.query.filter(Note.user_num == current_user.num).order_by(Note.update_time.asc()).all()
     return render_template("index.html", searchword=searchword, orders=orders, notes=notes, len=len(notes),order=order)
 
+# ノート一覧画面でのノート削除
 @app.route("/remove", methods=["POST"])
 @login_required
 def remove_note():
@@ -75,7 +60,7 @@ def remove_note():
         note_id = int(request.form.get("id"))
         destroy_note = Note.query.get(note_id)
         if destroy_note is None:
-            return {"message": "ノートが見つかりませんでした。"}, 404
+            return {"message": "ノートが見つかりませんでした"}, 404
         
         db.session.delete(destroy_note)
         db.session.commit()
@@ -85,8 +70,7 @@ def remove_note():
         db.session.rollback()
         return {"message": f"削除に失敗しました: {str(e)}"}, 500
 
-
-
+#ノート一覧画面でのノート新規作成（これは山本さんのやつに合わせた方がいい）
 @app.route('/note/create', methods=['POST'])
 @login_required
 def create_note():
@@ -95,6 +79,7 @@ def create_note():
     db.session.commit()
     return jsonify({'note_id': note.num})
 
+#ノート一覧画面で各ノートタイトルを押したとき、編集画面へ遷移
 @app.route('/note/<int:note_id>')
 @login_required
 def edit_note(note_id):
@@ -103,107 +88,8 @@ def edit_note(note_id):
         return "権限がありません", 403
     return render_template('note.html', note=note)
 
-@app.route('/note/<int:note_id>/save', methods=['POST'])
-@login_required
-def save_note(note_id):
-    note = Note.query.get_or_404(note_id)
-    if note.user_num != current_user.num:
-        return jsonify({'error': '権限がありません'}), 403
-    data = request.json
-    note.title = data.get('title', note.title)
-    note.content = data.get('content', note.content)
-    note.update_time = datetime.utcnow()
-    db.session.commit()
-    return jsonify({'message': '保存しました'})
-
-@app.route('/note/<int:note_id>/delete', methods=['POST'])
-@login_required
-def delete_note(note_id):
-    note = Note.query.get_or_404(note_id)
-    if note.user_num != current_user.num:
-        return jsonify({'error': '権限がありません'}), 403
-    db.session.delete(note)
-    db.session.commit()
-    return jsonify({'message': '削除しました'})
-
-@app.route('/newUser', methods=['GET', 'POST'])
-def newUser():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
-
-    form = NewUserForm()
-    
-    if form.validate_on_submit():
-        # フォームの入力内容を元に新規ユーザー作成
-        hashed_password = form.get_hashed_password()  # ハッシュ化されたパスワードを取得
-
-        new_user = User(
-            user_id=form.user_id.data,
-            password=hashed_password
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        
-        flash('ユーザー登録が完了しました。ログインしてください。')
-        return redirect(url_for('login'))  # login ページにリダイレクト
-    
-    return render_template('new_user.html', form=form)
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
-# ★AI要約API
-@app.route('/api/ai_search', methods=['POST'])
-@login_required
-def ai_search():
-    data = request.json
-    keyword = data.get('keyword', '').strip()
-    ai_level_flag = int(data.get('ai_level_flag', current_user.ai_level_flag))
-    ai_answer_flag = int(data.get('ai_answer_flag', current_user.ai_answer_flag))
-
-    if not keyword:
-        return jsonify({'result': 'キーワードを入力してください'}), 400
-
-    # プロンプト生成（条件分岐で内容を変える）
-    # 出力形式（ai_answer_flag）: 0=シンプル, 1=詳細, 2=箇条書き
-    # 難易度（ai_level_flag）: 0=初学者, 1=普通, 2=専門的
-
-    format_text = {
-        0: "できるだけ簡潔に（要点だけをまとめて200文字程度で）",
-        1: "詳細に、できるだけ具体的に（400文字程度で）",
-        2: "要点をまとめて箇条書きで4行程度で"
-    }[ai_answer_flag]
-
-    level_text = {
-        0: "初心者向けに",
-        1: "一般的なレベルで",
-        2: "専門家向けに"
-    }[ai_level_flag]
-
-    prompt = f"{keyword}について{level_text}、{format_text}、前置きはなくして日本語で解説してください。"
-
-    try:
-        client = genai.Client(api_key=GENAI_API_KEY)
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
-        summary = response.text.strip()
-    except Exception:
-        import traceback
-        traceback.print_exc()
-        summary = "AIによる解説の取得中にエラーが発生しました"
-    return jsonify({'result': summary})
-
-@app.route('/settings')
-def settings_page():
-    return render_template('settings.html')
-
-
-
+# ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑本田ノート一覧画面　オリジナル部分↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+# これより下は他の人のに合わせて
 
 if __name__ == '__main__':
     app.run(debug=True)
