@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>パスワード変更</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="login_body">
+<div class="login-container">
+    <a href="/custom" class="move_custom"><div>←設定に戻る</div></a>
+    <h2 class="access_page">パスワード変更</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p class="message">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <p class="form-group password-wrapper">
+            {{ form.now_password.label }}<br>
+            {{ form.now_password(class="acces_area",id="password",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="password" aria-hidden="true"></i>
+            {% if form.now_password.errors %}
+                <div class="message">
+                    {% for error in form.now_password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </p>
+
+        <p class="form-group password-wrapper">
+            {{ form.changed_password.label }}<br>
+            {{ form.changed_password(class="acces_area",id="changed_password",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="changed_password" aria-hidden="true"></i>
+            {% if form.changed_password.errors %}
+                <div class='message'>
+                    {% for error in form.changed_password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </p>
+        <p class="form-group password-wrapper">
+            {{ form.changed_confirm.label }}<br>
+            {{ form.changed_confirm(class="acces_area",id="changed_confirm",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="changed_confirm" aria-hidden="true"></i>
+            {% if form.changed_confirm.errors %}
+                <div class="message">
+                    {% for error in form.changed_confirm.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </p>
+
+        <p>{{form.submit(class="access_btn")}}</p>
+        <div class="pass_label">
+            <h4>パスワード変更に関する注意事項</h4>
+            <ul>
+                <li>パスワードは8文字以上16文字以下で設定してください。</li>
+                <li>現在のパスワードと同じパスワードは使用できません。</li>
+                <li>パスワードは英字（a-z,A-z）と数字（0-9）のみ使用できます。記号は使用できません。</li>
+            </ul>
+        </div>
+    </form>
+
+</div>
+
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+
+</body>
+</html>

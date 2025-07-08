@@ -28,7 +28,7 @@ class Note(db.Model):
     user_num = db.Column(db.Integer,nullable=False)
     title = db.Column(db.String(20), nullable=False)
     content = db.Column(db.Text, default=1, nullable=True)
-    created = db.Column(db.DateTime,default=datetime.utcnow)
+    update_time = db.Column(db.DateTime,default=datetime.utcnow)
 
     def __repr__(self):
         return self.title

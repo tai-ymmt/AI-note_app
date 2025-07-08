@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>新規登録</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="login_body">
+<div class="login-container">
+    <h2 class="access_page">新規登録</h2>
+    <p class="access_label">アカウントを作成してノートを管理しましょう</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <p class="message">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.user_id.label }}<br>
+            {{ form.user_id(class="acces_area",size=20) }}<br>
+            {% for error in form.user_id.errors %}
+                <span class="message">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <p class="form-group password-wrapper">
+            {{ form.password.label }}<br>
+            {{ form.password(class="acces_area",id="password",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="password" aria-hidden="true"></i>
+            {% for error in form.password.errors %}
+                <span class="message">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p class="form-group password-wrapper">
+            {{ form.confirm.label }}<br>
+            {{ form.confirm(class="acces_area",id="confirm",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="confirm" aria-hidden="true"></i>
+            {% for error in form.confirm.errors %}
+                <span class="message">{{ error }}</span>
+            {% endfor %}
+        </p>
+
+        <p>{{form.submit(class="access_btn")}}</p>
+    </form>
+    <p class="access_label">アカウントをお持ちの方は<a href="{{ url_for('login') }}">こちら</a></p>
+</div>
+
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+
+</body>
+</html>
