@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from config import Config
+<<<<<<< HEAD
 from models import db, User, Note
 from forms import LoginForm, NewUserForm
 from datetime import datetime
@@ -10,19 +11,25 @@ from datetime import datetime
 from google import genai
 GENAI_API_KEY = "AIzaSyCjjC-YoxhZIzNlCfznMeKQg138BptwDHU"
 client = genai.Client(api_key=GENAI_API_KEY)
+=======
+from forms import LoginForm, NewUserForm ,ChangePasswordForm
+from models import db, User, Note
+>>>>>>> main
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
+#login_manegerの設定（未ログイン時のアドレスはloginページへ）
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
 @login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+def load_user(num):
+    return User.query.get(int(num))
 
+<<<<<<< HEAD
 orders = ["新しい順", "古い順"]
 
 @app.route("/", methods=["GET", "POST"])
@@ -115,26 +122,52 @@ def delete_note(note_id):
     db.session.delete(note)
     db.session.commit()
     return jsonify({'message': '削除しました'})
+=======
 
+#一覧ページへ
+@app.route('/')
+@login_required
+def index():
+    return render_template('index.html', user_id=current_user.user_id)
+>>>>>>> main
+
+#ログインページへ
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        user_id = request.form.get('username')
-        password = request.form.get('password')
-        user = User.query.filter_by(user_id=user_id).first()
-        if user and check_password_hash(user.password, password):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(user_id=form.user_id.data).first()
+        if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             return redirect(url_for('index'))
         else:
-            flash('ログイン情報が正しくありません。')
-    return render_template('login.html')
+            flash('ユーザーIDかパスワードが正しくありません。','danger')
+            return redirect(url_for('login'))
 
+<<<<<<< HEAD
 @app.route('/newUser', methods=['GET', 'POST'])
 def newUser():
     if current_user.is_authenticated:
         return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
 
     form = NewUserForm()
+=======
+    return render_template('login.html', form=form)
+
+#新規登録
+@app.route('/newUser', methods=['GET', 'POST'])
+def newUser():
+    form = NewUserForm()
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))  # すでにログイン済みならリダイレクト
+    
+    if User.query.filter_by(user_id=form.user_id.data).first():
+        flash('そのユーザーIDは使用されています','danger')
+        return render_template('new_user.html', form=form)
+>>>>>>> main
     
     if form.validate_on_submit():
         # フォームの入力内容を元に新規ユーザー作成
@@ -147,17 +180,28 @@ def newUser():
         db.session.add(new_user)
         db.session.commit()
         
+<<<<<<< HEAD
         flash('ユーザー登録が完了しました。ログインしてください。')
+=======
+        flash('ユーザー登録が完了しました。ログインしてください。','danger')
+>>>>>>> main
         return redirect(url_for('login'))  # login ページにリダイレクト
     
     return render_template('new_user.html', form=form)
 
+<<<<<<< HEAD
+=======
+#ログアウト
+>>>>>>> main
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
+    flash('ログアウトしました。','success')
+
     return redirect(url_for('login'))
 
+<<<<<<< HEAD
 # ★AI要約API
 @app.route('/api/ai_search', methods=['POST'])
 @login_required
@@ -200,6 +244,33 @@ def ai_search():
         traceback.print_exc()
         summary = "AIによる解説の取得中にエラーが発生しました"
     return jsonify({'result': summary})
+=======
+#パスワード変更
+@app.route('/changePassword', methods=['GET', 'POST'])
+@login_required
+def changePassword():
+    form = ChangePasswordForm()
+    
+    if form.validate_on_submit():
+        # 現在のパスワードチェック
+        if not check_password_hash(current_user.password, form.now_password.data):
+            flash('現在のパスワードが正しくありません','danger')
+            return render_template('change_pass.html', form=form)
+        
+        #現在と一致している場合エラー
+        if check_password_hash(current_user.password, form.changed_password.data):
+            flash('新しいパスワードが現在のパスワードと同じです','danger')
+            return render_template('change_pass.html', form=form)
+        
+        current_user.password = generate_password_hash(form.changed_password.data)
+        db.session.commit()
+        #遷移前にログアウト
+        logout_user()
+        flash('パスワード変更しました。ログインしてください','success')
+        return redirect(url_for('login'))
+    
+    return render_template('change_pass.html',form=form)
+>>>>>>> main
 
 
 
