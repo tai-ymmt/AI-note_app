@@ -9,9 +9,9 @@
         パスワード:NOTE-uSER
         全権限の付与
 
-    下記ファイルの実行
-        create.sql
-        demo_user_create.py
+    下記コード実行
+        source create.sql (mysql -u （ユーザー名）-p　実施後に実行)
+        python demo_user_create.py
 
 
 #サーバーの起動について
