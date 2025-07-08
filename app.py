@@ -71,14 +71,20 @@ def index():
 @app.route("/remove", methods=["POST"])
 @login_required
 def remove_note():
-    print("呼ばれてる")
-    note_id = int(request.form.get("id"))
-    destroy_note = Note.query.get(note_id)
-    db.session.delete(destroy_note)
-    db.session.commit()
-    
-    notes = Note.query.all()
-    return render_template('index.html', notes=notes)
+    try:
+        note_id = int(request.form.get("id"))
+        destroy_note = Note.query.get(note_id)
+        if destroy_note is None:
+            return {"message": "ノートが見つかりませんでした。"}, 404
+        
+        db.session.delete(destroy_note)
+        db.session.commit()
+        
+        return {"message": "削除しました"}, 200
+    except Exception as e:
+        db.session.rollback()
+        return {"message": f"削除に失敗しました: {str(e)}"}, 500
+
 
 
 @app.route('/note/create', methods=['POST'])
@@ -191,6 +197,11 @@ def ai_search():
         traceback.print_exc()
         summary = "AIによる解説の取得中にエラーが発生しました"
     return jsonify({'result': summary})
+
+@app.route('/settings')
+def settings_page():
+    return render_template('settings.html')
+
 
 
 

@@ -58,6 +58,7 @@
         visibility: visible;
         pointer-events: auto;
         transition: opacity 0.4s;
+        display: block;
         }
         .modal-outer { display: none; position: fixed; left:0; top:0; width:100vw; height:100vh; background: rgba(40,30,55,0.17); z-index:99999; align-items: center; justify-content: center; }
         .modal-outer.is-visible { display: flex; }
@@ -70,6 +71,7 @@
         .modal-textarea { resize: vertical; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 1em; margin-top: 2em; }
     </style>
+    {% include "header.html" %}
 </head>
 <body style="margin: 0; padding: 0;">
     <div style="max-width: 90%; margin: 0 auto; padding: 0 32px; box-sizing: border-box;">
@@ -103,30 +105,32 @@
         {% if len>0 %}
         <!-- ノート一覧テーブル -->
         <table class="editor-section" style="border: none; margin-top: 24px; width: 100%; border-collapse: collapse;" cellpadding="8" cellspacing="0">
-            <thead>
-                <tr>
-                    <!-- タイトル列 -->
-                    <th style="text-align: left; padding-left: 5%;">タイトル</th>
-                    <!-- 最終更新日列 -->
-                    <th style="text-align: left; padding-left: 20%;">最終更新日</th>
-                    <!-- 操作列 -->
-                    <th></th>
-                </tr>
-            </thead>
-            <today>
+           <thead>
+            <tr>
+                <!-- タイトル列 -->
+                <th style="text-align: left; padding-left: 5%; width: 45ch;">タイトル</th>
+                <!-- 最終更新日列 -->
+                <th style="text-align: left;">最終更新日</th>
+                <!-- 操作列 -->
+                <th style="width: 15%;"></th>
+            </tr>
+        </thead>
+        <tbody>
             {% for note in notes: %}
             <tr id="hyou" onclick="location.href='/note/{{ note.num }}'">
-                    <td style="text-align: left; padding-left: 5%;" >{{ note.title }}</td>
-                    <td style="text-align: left; padding-left: 20%;">{{ note.update_time.strftime('%Y年%m月%d日') }}</td>
-                    <td style="text-align: center;">
-                        <!-- ノート一覧テーブル内の削除ボタン -->
-                        <button type="button"
-                            onclick="event.stopPropagation(); confirmDeleteCustom('{{ note.num }}', '{{ note.title|e }}')"
-                            class="btn btn-delete" style="font-size: 1.0em;"><i class="fas fa-trash-alt"></i></button>
-                    </td>
+                <td style="text-align: left; padding-left: 5%; width: 45ch;">{{ note.title }}</td>
+                <td style="text-align: left;">{{ note.update_time.strftime('%Y年%m月%d日') }}</td>
+                <td style="text-align: left; width: 1%;">
+                    <!-- ノート一覧テーブル内の削除ボタン -->
+                    <button type="button"
+                        onclick="event.stopPropagation(); confirmDeleteCustom('{{ note.num }}', '{{ note.title|e }}')"
+                        class="btn btn-delete" style="font-size: 1.0em;"><i class="fas fa-trash-alt"></i></button>
+                </td>
             </tr>
             {% endfor %}
-            </today>
+        </tbody>
+
+
         </table>
         {% endif %}
         <!-- ノートがない場合のメッセージ -->
@@ -154,9 +158,7 @@
   </div>
   
    <!-- トースト通知 -->
-    <div id="toast" style="display:none; position:fixed; bottom:40px; left:50%; transform:translateX(-50%); background:#323232; color:#fff; padding:16px 32px; border-radius:8px; font-size:1.1em; z-index:2000; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-        削除しました
-    </div>
+    <div id="toast"></div>
 
     <script>
     document.getElementById('create-note-btn').addEventListener('click', function() {
@@ -167,6 +169,9 @@
           window.location.href = '/note/' + data.note_id;
         });
     });
+
+    const toast = document.getElementById('toast');
+      let toastTimer = null;
     
     function clearbutton(){
         const searchWord = document.getElementById('searchword').value;
@@ -181,6 +186,7 @@
    
 // 削除確認モーダルを表示
 function confirmDeleteCustom(id, title) {
+    console.log("削除確認モーダルを表示");
     document.getElementById('remove-confirm-modal').style.display = 'flex';
     document.getElementById('modal-note-title').textContent = title;
     document.getElementById('confirm-remove-btn').onclick = function() {
@@ -188,12 +194,30 @@ function confirmDeleteCustom(id, title) {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'id=' + encodeURIComponent(id)
-        }).then(() => {
-            location.reload();
-            showToast('削除しました');
-            });
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(data => { throw new Error(data.message); });
+            }
+            return response.json();
+        }).then(data => {
+            setTimeout(() => window.location.reload(), 1200); // 画面を更新
+            showToast(data.message || '削除しました');
+            }).catch(error => {
+            console.error('Error:', error);
+            showToast(error.message);
+        });
         closeModal();
     };
+}
+
+// ===== トースト通知 =====
+function showToast(message) {
+    if (toastTimer) clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    toastTimer = setTimeout(() => {
+        toast.classList.remove('is-visible');
+    }, 2500);
 }
 
 // モーダルを閉じる
@@ -201,15 +225,7 @@ function closeModal() {
     document.getElementById('remove-confirm-modal').style.display = 'none';
 }
 
-// トースト表示関数
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.display = 'block';
-    setTimeout(() => window.location.href = '/', 1200);
-}
-
-    clearbutton();
+clearbutton();
     
     </script>
 </body>
