@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <title>ノート編集 - AI Note App</title>
-  <!-- ローカルCSS -->
+  <!-- ローカルCSSファイルの読み込み -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <!-- Google FontsとFontAwesome -->
+  <!-- Google FontsとFontAwesomeの読み込み -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Markdown→HTML変換用 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 </head>
 <body>
-  <!-- ヘッダー -->
+  <!-- サイト共通ヘッダーの読み込み -->
   {% include "header.html" %}
 
-  <!-- 1. トップバー（戻る・保存・削除） -->
+  <!-- 画面上部の操作バー（戻る・保存・削除） -->
   <div class="top-bar">
     <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
     <div class="top-bar-right">
@@ -22,15 +25,15 @@
     </div>
   </div>
   
-  <!-- 2. メイン2カラム（左：エディタ、右：AI） -->
+  <!-- メインの2カラム構成 -->
   <main class="main-content">
-    <!-- 左：ノート編集 -->
+    <!-- 左：ノート編集エリア -->
     <section class="editor-section">
       <div class="note-title-bar">
-        <!-- タイトル入力 -->
+        <!-- ノートタイトル入力欄 -->
         <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
       </div>
-      <!-- ツールバー（装飾ボタン） -->
+      <!-- エディタ用ツールバー -->
       <div class="editor-toolbar">
         <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
         <button class="toolbar-btn" data-command="italic" title="斜体"><i class="fas fa-italic"></i></button>
@@ -43,7 +46,7 @@
         <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
         <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
       </div>
-      <!-- リッチエディタ -->
+      <!-- 本文のリッチテキストエディタ -->
       <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
     </section>
     <!-- 右：AIサイドバー -->
@@ -52,14 +55,14 @@
         <span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span>
         <button class="btn btn-ghost" id="open-ai-settings-btn" aria-label="AI詳細設定"><i class="fas fa-cog"></i></button>
       </div>
-      <!-- AI検索入力 -->
+      <!-- AI検索の入力欄 -->
       <div class="ai-search-section">
         <div class="search-input-wrapper">
           <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="20" required />
           <button class="search-btn" aria-label="AI検索"><i class="fas fa-search"></i></button>
         </div>
       </div>
-      <!-- AI検索結果エリア -->
+      <!-- AI検索結果・ウェルカム・ローディング -->
       <div class="ai-results">
         <div id="ai-loading" style="display: none; text-align:center;">
           <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
@@ -79,12 +82,10 @@
     </aside>
   </main>
   
-  <!-- 3. トースト通知（どの画面でも一番手前で表示） -->
+  <!-- トースト通知用（小さな一時メッセージ表示） -->
   <div id="toast"></div>
 
-  <!-- 4. 各種モーダルはページ最後でまとめて管理 -->
-
-  <!-- 未保存警告 -->
+  <!-- ノート未保存警告モーダル（戻る時） -->
   <div id="unsaved-confirm-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -102,7 +103,8 @@
       </div>
     </div>
   </div>
-  <!-- 削除確認 -->
+
+  <!-- ノート削除確認モーダル -->
   <div id="delete-confirm-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -119,7 +121,8 @@
       </div>
     </div>
   </div>
-  <!-- AI詳細設定 -->
+
+  <!-- AI詳細設定モーダル -->
   <div id="ai-settings-modal" class="modal-outer">
     <div class="modal-inner">
       <div class="modal-header">
@@ -151,38 +154,16 @@
     </div>
   </div>
 
-  <!-- 5. JavaScript（機能順にブロック化） -->
+  <!-- JavaScript部：イベント登録・動的処理 -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ====== グローバル変数定義 ======
-      const saveBtn = document.getElementById('save-note-btn');
-      const backBtn = document.getElementById('back-btn');
-      const toast = document.getElementById('toast');
-      let toastTimer = null;
-      const aiSettingsModal = document.getElementById('ai-settings-modal');
-      const openAiSettingsBtn = document.getElementById('open-ai-settings-btn');
-      const closeAiSettingsBtn = document.getElementById('close-ai-settings-btn');
-      const cancelAiSettingsBtn = document.getElementById('cancel-ai-settings-btn');
-      const aiSettingsForm = document.getElementById('ai-settings-form');
-      const deleteNoteBtn = document.getElementById('delete-note-btn');
-      const deleteConfirmModal = document.getElementById('delete-confirm-modal');
-      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-      const noteId = {{ note.num | tojson if note else 'null' }};
-      const titleInput = document.querySelector('.note-title-input');
-      const contentEditor = document.querySelector('.rich-editor');
-      const unsavedConfirmModal = document.getElementById('unsaved-confirm-modal');
-      const cancelUnsavedBtn = document.getElementById('cancel-unsaved-btn');
-      const confirmUnsavedBtn = document.getElementById('confirm-unsaved-btn');
-      let isEdited = false;
-      let pendingBack = false;
-
-      // ====== エディタツールバー処理 ======
+      // ===== ツールバーボタン（太字/斜体などの装飾）処理 =====
       document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
           const command = btn.getAttribute('data-command');
           const value = btn.getAttribute('data-value') || null;
+          // リンクの場合はURL入力
           if (command === "createLink") {
             const url = prompt("リンク先のURLを入力してください", "https://");
             if (url) document.execCommand(command, false, url);
@@ -194,7 +175,8 @@
           updateToolbarState();
         });
       });
-      // 装飾状態の反映
+
+      // ボタンのハイライト状態を反映する
       function updateToolbarState() {
         const commandMap = {
           bold: 'bold',
@@ -213,102 +195,47 @@
           }
         });
       }
+      // エディタへのイベントで状態更新
       const richEditor = document.querySelector('.rich-editor');
       ['keyup', 'mouseup', 'click'].forEach(evt => {
         richEditor.addEventListener(evt, updateToolbarState);
       });
       updateToolbarState();
 
-      // ====== ノート入力監視（未保存管理） ======
+      // ===== DOM要素取得 =====
+      const saveBtn = document.getElementById('save-note-btn');
+      const backBtn = document.getElementById('back-btn');
+      const toast = document.getElementById('toast');
+      let toastTimer = null;
+
+      const aiSettingsModal = document.getElementById('ai-settings-modal');
+      const openAiSettingsBtn = document.getElementById('open-ai-settings-btn');
+      const closeAiSettingsBtn = document.getElementById('close-ai-settings-btn');
+      const cancelAiSettingsBtn = document.getElementById('cancel-ai-settings-btn');
+      const aiSettingsForm = document.getElementById('ai-settings-form');
+      
+      const deleteNoteBtn = document.getElementById('delete-note-btn');
+      const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+      const noteId = {{ note.num | tojson if note else 'null' }};
+      const titleInput = document.querySelector('.note-title-input');
+      const contentEditor = document.querySelector('.rich-editor');
+
+      // ===== 未保存時警告の管理 =====
+      const unsavedConfirmModal = document.getElementById('unsaved-confirm-modal');
+      const cancelUnsavedBtn = document.getElementById('cancel-unsaved-btn');
+      const confirmUnsavedBtn = document.getElementById('confirm-unsaved-btn');
+      let isEdited = false;
+      let pendingBack = false;
+
+      // 入力内容に変化があれば未保存フラグを立てる
       if (titleInput && contentEditor) {
         titleInput.addEventListener('input', () => isEdited = true);
         contentEditor.addEventListener('input', () => isEdited = true);
       }
 
-      // ====== ノート保存処理 ======
-      saveBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const title = titleInput.value;
-        const content = contentEditor.innerHTML;
-        const url = noteId ? `/note/${noteId}/save` : `/note/save`;
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, content })
-        })
-        .then(res => res.json())
-        .then(data => {
-            showToast(data.message || 'ノートが保存されました');
-            isEdited = false;
-            if (!noteId && data.note_id) {
-              setTimeout(() => {
-                window.location.href = `/note/${data.note_id}`;
-              }, 1200);
-            }
-        })
-        .catch(() => showToast('ノートの保存に失敗しました'));
-      });
-
-      // ====== ノート削除処理 ======
-      deleteNoteBtn.addEventListener('click', () => {
-        deleteConfirmModal.classList.add('is-visible');
-      });
-      cancelDeleteBtn.addEventListener('click', () => {
-        deleteConfirmModal.classList.remove('is-visible');
-      });
-      confirmDeleteBtn.addEventListener('click', () => {
-        fetch(`/note/${noteId}/delete`, { method: 'POST' })
-          .then(res => res.json())
-          .then(data => {
-            showToast(data.message || 'ノートを削除しました。');
-            setTimeout(() => window.location.href = '/', 1200);
-          })
-          .catch(() => showToast('ノートの削除に失敗しました'));
-        deleteConfirmModal.classList.remove('is-visible');
-      });
-
-      // ====== AI検索ボタン ======
-      document.querySelector('.search-btn').addEventListener('click', () => {
-        const keyword = document.querySelector('.search-input').value;
-        const aiLoading = document.getElementById('ai-loading');
-        const aiOutput = document.getElementById('ai-output');
-        const aiWelcome = document.getElementById('ai-welcome');
-        aiLoading.style.display = 'block';
-        aiOutput.style.display = 'none';
-        aiWelcome.style.display = 'none';
-        fetch('/api/ai_search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-            keyword,
-            ai_level_flag: document.getElementById('target-level').value,
-            ai_answer_flag: document.getElementById('output-format').value
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            aiLoading.style.display = 'none';
-            aiOutput.innerHTML = `
-                <div id="ai-output-text" style="margin-bottom: 1em;">${data.result || '検索結果なし'}</div>
-                <button id="paste-to-note-btn" class="btn btn-save" style="margin-top: 0.4em;"><i class="fas fa-clipboard"></i> 貼り付け</button>
-            `;
-            aiOutput.style.display = 'block';
-            document.getElementById('paste-to-note-btn').addEventListener('click', () => {
-                const aiOutputText = document.getElementById('ai-output-text').innerText;
-                const editor = document.querySelector('.rich-editor');
-                editor.innerHTML += `<br>${aiOutputText}`;
-                isEdited = true;
-                showToast('AI出力をノートに貼り付けました');
-            });
-        })
-        .catch(() => {
-            aiLoading.style.display = 'none';
-            aiOutput.style.display = 'block';
-            aiOutput.innerHTML = '<div style="color:#d64242;">AI要約の取得に失敗しました</div>';
-        });
-      });
-
-      // ====== 未保存警告モーダル処理 ======
+      // 戻る時の未保存警告モーダル表示
       backBtn.addEventListener('click', (e) => {
         if (isEdited) {
           e.preventDefault();
@@ -335,8 +262,99 @@
           unsavedConfirmModal.classList.remove('is-visible');
         }
       });
+      // ノート保存後に未保存フラグを下ろす
+      function markSaved() { isEdited = false; }
 
-      // ====== AI詳細設定モーダル ======
+      // ===== ノート保存処理 =====
+      saveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const title = titleInput.value;
+        const content = contentEditor.innerHTML;
+        const url = noteId ? `/note/${noteId}/save` : `/note/save`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content })
+        })
+        .then(res => res.json())
+        .then(data => {
+            showToast(data.message || 'ノートが保存されました');
+            markSaved();
+            // 新規ノートの場合はノート詳細画面に遷移
+            if (!noteId && data.note_id) {
+              setTimeout(() => {
+                window.location.href = `/note/${data.note_id}`;
+              }, 1200);
+            }
+        })
+        .catch(() => showToast('ノートの保存に失敗しました'));
+      });
+
+      // ===== ノート削除処理 =====
+      deleteNoteBtn.addEventListener('click', () => {
+        deleteConfirmModal.classList.add('is-visible');
+      });
+      cancelDeleteBtn.addEventListener('click', () => {
+        deleteConfirmModal.classList.remove('is-visible');
+      });
+      confirmDeleteBtn.addEventListener('click', () => {
+        fetch(`/note/${noteId}/delete`, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            showToast(data.message || 'ノートを削除しました。');
+            setTimeout(() => window.location.href = '/', 1200);
+          })
+          .catch(() => showToast('ノートの削除に失敗しました'));
+        deleteConfirmModal.classList.remove('is-visible');
+      });
+      
+      // ===== AI検索ボタン処理 =====
+      document.querySelector('.search-btn').addEventListener('click', () => {
+        const keyword = document.querySelector('.search-input').value;
+        const aiLoading = document.getElementById('ai-loading');
+        const aiOutput = document.getElementById('ai-output');
+        const aiWelcome = document.getElementById('ai-welcome');
+
+        aiLoading.style.display = 'block';
+        aiOutput.style.display = 'none';
+        aiWelcome.style.display = 'none';
+
+        fetch('/api/ai_search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+            keyword,
+            ai_level_flag: document.getElementById('target-level').value,
+            ai_answer_flag: document.getElementById('output-format').value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            aiLoading.style.display = 'none';
+            aiOutput.innerHTML = `
+                <div id="ai-output-text" style="margin-bottom: 1em;">${data.result || '検索結果なし'}</div>
+                <button id="paste-to-note-btn" class="btn btn-save" style="margin-top: 0.4em;"><i class="fas fa-clipboard"></i> 貼り付け</button>
+            `;
+            aiOutput.style.display = 'block';
+            // AI出力をノートに貼り付ける
+            document.getElementById('paste-to-note-btn').addEventListener('click', () => {
+                const aiOutputText = document.getElementById('ai-output-text').innerText;
+                const html = marked.parse(aiOutputText);
+                const editor = document.querySelector('.rich-editor');
+                editor.innerHTML += `<br>${aiOutputText}`;
+                isEdited = true; // AI貼り付けも編集扱い
+                showToast('AI出力をノートに貼り付けました');
+            });
+        })
+        .catch(() => {
+            aiLoading.style.display = 'none';
+            aiOutput.style.display = 'block';
+            aiOutput.innerHTML = '<div style="color:#d64242;">AI要約の取得に失敗しました</div>';
+        });
+      });
+
+      // ===== AI詳細設定モーダル操作 =====
       openAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.add('is-visible'));
       closeAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
       cancelAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
@@ -345,6 +363,7 @@
         aiSettingsModal.classList.remove('is-visible');
         showToast('AI設定を保存しました');
       });
+      // モーダル外クリックで閉じる
       [aiSettingsModal, deleteConfirmModal].forEach(modal => {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) {
@@ -353,7 +372,7 @@
         });
       });
 
-      // ====== トースト通知表示関数 ======
+      // ===== トースト通知表示関数 =====
       function showToast(message) {
         if (toastTimer) clearTimeout(toastTimer);
         toast.textContent = message;
