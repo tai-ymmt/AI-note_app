@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+<div class="login-container">
+    <h2 class="access_page">ログイン</h2>
+    <p class="access_label">アカウントにログインしてノートを管理しましょう</p>
+
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.user_id.label }}<br>
+            {{ form.user_id(size=20) }}<br>
+        </p>
+
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=16) }}<br>
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flashes">
+              {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <p>{{ form.submit(class="access_btn") }}</p>
+    </form>
+    <p class="access_label">アカウントをお持ちでない方は<a href="{{ url_for('newUser') }}">こちら</a></p>
+  </div>
+</body>
+</html>
+

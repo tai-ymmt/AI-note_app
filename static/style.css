@@ -1,0 +1,80 @@
+/*共通デザイン*/
+body {
+    font-family: 'Inter', 'Noto Sans JP', sans-serif; color: #222;
+    background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
+    color: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+/*ユーザー情報入力ページデザイン*/
+.login-container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+    width: 300px;
+    text-align: center;
+}
+.access_page {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.access_btn {
+    background: #6c63ff;
+    color: #fff;
+    width: 300px;
+    border-radius: 8px;
+    border: none;
+}
+.access_label {
+    opacity: 0.5;
+    font-size: 12px;
+}
+.pass_label{
+    background: #e4eaff;
+    font-size: 12px;
+    color: #6c63ff;
+    text-align: left;
+    padding: 0px 10px 10px;
+    width: 290px;
+}
+.pass_label li{
+    font-size: 9px;
+
+}
+.move_custom {
+    color: #6c63ff;
+     text-decoration: none;
+     text-align: left;
+     font-size: 12px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/*エラーメッセージ対応*/
+.message {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+/*flashメッセージ適応*/
+ .flash-message.success {
+     color: green; 
+} 
+ .flash-message.danger {
+     color: red; 
+}
+
