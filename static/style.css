@@ -1,3 +1,118 @@
+
+/*共通デザイン*/
+body {
+    margin: 0;
+    padding: 0; 
+    background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    color: #222; min-height: 100vh;
+    position: relative; 
+}
+
+/*ユーザー情報入力ページデザイン*/
+body.login_body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+    width: 300px;
+    text-align: center;
+}
+.access_page {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.access_btn {
+    background: #6c63ff;
+    color: #fff;
+    width: 300px;
+    height: 35px;
+    border-radius: 8px;
+    border: none;
+}
+.access_label {
+    opacity: 0.5;
+    font-size: 12px;
+}
+.pass_label{
+    background: #e4eaff;
+    font-size: 12px;
+    color: #6c63ff;
+    text-align: left;
+    padding: 0px 10px 10px;
+    width: 290px;
+}
+.pass_label li{
+    font-size: 9px;
+
+}
+.move_custom {
+    color: #6c63ff;
+     text-decoration: none;
+     text-align: left;
+     font-size: 12px;
+}
+.acces_area {
+    width: 100%;
+    padding: 10px 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 入力欄に被らないようにアイコンを配置 */
+.password-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* アイコンの位置 */
+.toggle-icon {
+  position: absolute;
+  top: 70%;
+  right: 0;
+  transform: translateY(-125%);
+  cursor: pointer;
+  color: #888;
+}
+
+/*エラーメッセージ対応*/
+.message {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+/*flashメッセージ適応*/
+ .flash-message.success {
+     color: green; 
+} 
+ .flash-message.danger {
+     color: red; 
+}
+
+/* ブラウザのデフォルトアイコン非表示 */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}
+
+
 /* ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ CSS 山本さんのCSSのうちノート一覧に使用しているもの ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ */
 body { margin: 0; padding: 0; background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%); font-family: 'Inter', 'Noto Sans JP', sans-serif; color: #222; min-height: 100vh; position: relative; }
 .btn { display: inline-flex; align-items: center; gap: 0.35em; border: none; border-radius: 6px; padding: 0.55em 1.3em; font-weight: 600; font-size: 1rem; cursor: pointer; background: none; transition: background 0.15s, color 0.15s; box-shadow: 0 1px 4px rgba(108,99,255,0.08); }
@@ -53,3 +168,4 @@ transition: opacity 0.4s;
 .ichiran-search-input:focus { border: 1.5px solid #6c63ff; }
 .modal-select { padding: 0.7em 0.7em; border-radius: 7px; border: 1px solid #eceafd;}
 /* ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ CSS 本田オリジナル ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ */
+

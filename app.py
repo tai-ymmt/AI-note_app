@@ -20,11 +20,19 @@ login_manager.init_app(app)
 def load_user(num):
     return User.query.get(int(num))
 
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('ログインが必要です。先にログインしてください。', 'danger')  # カスタムメッセージ
+    return redirect(url_for('login'))
+
+
 # これより上は他の人のに合わせて
 # ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓本田ノート一覧画面　オリジナル部分↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
 # 並び替えプルダウンの中身
 orders = ["新しい順", "古い順"]
+
 
 # ノート一覧画面
 @app.route("/", methods=["GET", "POST"])
