@@ -4,7 +4,8 @@ body {
     padding: 0; 
     background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    color: #222; min-height: 100vh; position: relative; 
+    color: #222; min-height: 100vh;
+    position: relative; 
 }
 
 /*ユーザー情報入力ページデザイン*/
