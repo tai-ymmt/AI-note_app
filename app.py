@@ -153,6 +153,26 @@ def logout():
 
     return redirect(url_for('login'))
 
+@app.route('/custom')
+def settings_page():
+    return render_template('custom.html')
+
+@app.route('/custom', methods=['GET', 'POST'])
+@login_required
+def save_setting():
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            current_user.mode_flag = int(data.get('mode_flag', current_user.mode_flag))
+            current_user.ai_answer_flag = int(data.get('ai_answer_flag', current_user.ai_answer_flag))
+            current_user.ai_level_flag = int(data.get('ai_level_flag', current_user.ai_level_flag))
+            db.session.commit()
+            return jsonify(success=True)
+        except Exception as e:
+            print("保存エラー:", e)
+            return jsonify(success=False), 500
+    else:
+        return render_template('custom.html')
 
 #パスワード変更
 @app.route('/changePassword', methods=['GET', 'POST'])

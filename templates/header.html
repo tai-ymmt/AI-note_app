@@ -1,3 +1,27 @@
+<div class="app-header">
+    <div class="app-icon">
+        <a href="一覧画面へのpath" class="icon">
+            <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="10" width="180" height="40" rx="10" ry="10" fill="purple" />
+            </svg>
+        </a>
+    </div>
+    <a href="{{ url_for('settings_page') }}" class="setting-actions">
+        <span class="gear-icon">⚙️</span>
+        <span class="setting-link">設定</span>
+    </a>
+</div>
+
+<script>
+    if (window.location.pathname.includes("settings")) {
+        const settingActions = document.querySelector(".setting-actions");
+        const settingLink = document.querySelector(".setting-link");
+        if (settingActions && settingLink) {
+            settingActions.style.backgroundColor = "#ae3e89";
+            settingLink.style.color = "#fff";
+        }
+    }
+</script>
 <nav>
     <a href="{{ url_for('index') }}">ホーム</a>
     {% if current_user.is_authenticated %}

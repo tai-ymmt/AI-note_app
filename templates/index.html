@@ -2,6 +2,21 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+
+    <title>マイページ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+            {% include "header.html" %}
+    </header>
+    <main>
+    <h1>ようこそ、{{ name }} さん</h1>
+    <p><a href="{{ url_for('logout') }}">ログアウト</a></p>
+    </main>
+</body>
+</html>
+
     <title>ノート一覧</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -172,3 +187,4 @@
     }
     
     </script>
+
