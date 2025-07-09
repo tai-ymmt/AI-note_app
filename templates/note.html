@@ -10,17 +10,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Markdown→HTML変換用 -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 </head>
 <body>
   <!-- サイト共通ヘッダーの読み込み -->
    <header>
         {% include "header.html" %}
    </header>
-   
-
-  
-
   <!-- 画面上部の操作バー（戻る・保存・削除） -->
   <div class="top-bar">
     <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
@@ -158,6 +153,17 @@
 
   <!-- JavaScript部：イベント登録・動的処理 -->
   <script>
+    // ==== タイムアウト付きfetch関数 ====
+    function fetchWithTimeout(resource, options = {}) {
+      const { timeout = 20000 } = options; // 20秒
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      return fetch(resource, {
+        ...options,
+        signal: controller.signal
+      }).finally(() => clearTimeout(id));
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       // ===== ツールバーボタン（太字/斜体などの装飾）処理 =====
       document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
@@ -252,11 +258,10 @@
         unsavedConfirmModal.classList.remove('is-visible');
       });
 
-// 画面遷移用イベント捕捉（<a>タグの通常遷移、button[data-navigate]のクリック）
+// 画面遷移用イベント捕捉
 document.body.addEventListener('click', function(e) {
   const a = e.target.closest('a');
   if (a && a.getAttribute('href') && !a.getAttribute('target') && a.getAttribute('href').charAt(0) === '/') {
-    // ノート一覧ボタンは既存の処理でOK
     if (a.id === 'back-btn') return;
     if (isEdited) {
       e.preventDefault();
@@ -281,15 +286,12 @@ confirmUnsavedBtn.addEventListener('click', () => {
   }
 });
 
-
-
       unsavedConfirmModal.addEventListener('click', (e) => {
         if (e.target === unsavedConfirmModal) {
           pendingBack = false;
           unsavedConfirmModal.classList.remove('is-visible');
         }
       });
-      // ノート保存後に未保存フラグを下ろす
       function markSaved() { isEdited = false; }
 
       // ===== ノート保存処理 =====
@@ -308,7 +310,6 @@ confirmUnsavedBtn.addEventListener('click', () => {
         .then(data => {
             showToast(data.message || 'ノートが保存されました');
             markSaved();
-            // 新規ノートの場合はノート詳細画面に遷移
             if (!noteId && data.note_id) {
               setTimeout(() => {
                 window.location.href = `/note/${data.note_id}`;
@@ -329,15 +330,13 @@ confirmUnsavedBtn.addEventListener('click', () => {
         fetch(`/note/${noteId}/delete`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
-            // 削除成功時、ノート一覧画面に通知を渡して遷移
             window.location.href = '/?toast=' + encodeURIComponent(data.message || 'ノートを削除しました');
             })
             .catch(() => showToast('ノートの削除に失敗しました'));
         deleteConfirmModal.classList.remove('is-visible');
         });
 
-      
-      // ===== AI検索ボタン処理 =====
+      // ===== AI検索ボタン処理（20秒タイムアウト付きfetchに変更） =====
       document.querySelector('.search-btn').addEventListener('click', () => {
         const keyword = document.querySelector('.search-input').value;
         const aiLoading = document.getElementById('ai-loading');
@@ -348,14 +347,15 @@ confirmUnsavedBtn.addEventListener('click', () => {
         aiOutput.style.display = 'none';
         aiWelcome.style.display = 'none';
 
-        fetch('/api/ai_search', {
+        fetchWithTimeout('/api/ai_search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
             keyword,
             ai_level_flag: document.getElementById('target-level').value,
             ai_answer_flag: document.getElementById('output-format').value
-            })
+            }),
+            timeout: 20000 // 20秒
         })
         .then(res => res.json())
         .then(data => {
@@ -365,19 +365,18 @@ confirmUnsavedBtn.addEventListener('click', () => {
                 <button id="paste-to-note-btn" class="btn btn-save" style="margin-top: 0.4em;"><i class="fas fa-clipboard"></i> 貼り付け</button>
             `;
             aiOutput.style.display = 'block';
-            // AI出力をノートに貼り付ける
             document.getElementById('paste-to-note-btn').addEventListener('click', () => {
-                const aiOutputText = document.getElementById('ai-output-text').innerHTML;;
+                const aiOutputText = document.getElementById('ai-output-text').innerHTML;
                 const editor = document.querySelector('.rich-editor');
                 editor.innerHTML += `<br>${aiOutputText}`;
                 isEdited = true; 
                 showToast('AI出力をノートに貼り付けました');
             });
         })
-        .catch(() => {
+        .catch(err => {
             aiLoading.style.display = 'none';
             aiOutput.style.display = 'block';
-            aiOutput.innerHTML = '<div style="color:#d64242;">AI要約の取得に失敗しました</div>';
+            aiOutput.innerHTML = '<div ">AIによる解説の取得中にエラーが発生しました</div>';
         });
       });
 
@@ -390,7 +389,6 @@ confirmUnsavedBtn.addEventListener('click', () => {
         aiSettingsModal.classList.remove('is-visible');
         showToast('AI設定を保存しました');
       });
-      // モーダル外クリックで閉じる
       [aiSettingsModal, deleteConfirmModal].forEach(modal => {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) {

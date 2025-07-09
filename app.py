@@ -142,7 +142,11 @@ def save_note_new_or_edit():
         # 新規作成（DB追加）
         note = Note(user_num=current_user.num)
         db.session.add(note)
-    note.title = data.get('title', '')
+
+    title = data.get('title', '').strip()
+    if not title:
+        title = '無題のノート'
+    note.title = title
     note.content = data.get('content', '')
     note.update_time = datetime.utcnow()
     db.session.commit()
@@ -158,7 +162,12 @@ def save_note(note_id):
     if note.user_num != current_user.num:
         return jsonify({'error': '権限がありません'}), 403
     data = request.json
-    note.title = data.get('title', note.title)
+ 
+    title = data.get('title', '').strip()
+    if not title:
+        title = '無題のノート'
+    note.title = title
+    
     note.content = data.get('content', note.content)
     note.update_time = datetime.utcnow()
     db.session.commit()
