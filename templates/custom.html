@@ -34,7 +34,7 @@
         <section class="theme-setting">
             <h2 class="custom-page">テーマ設定</h2>
             <p class="custom-page">アプリの表示テーマを設定できます</p>
-            <div class="form-group">
+            <div class="custum-page-form-group">
                 <label for="theme-select">テーマ</label>
                 <select id="theme" name="mode_flag">
                     <option value="1" {% if current_user.mode_flag == 1 %}selected{% endif %}>ライトモード</option>
@@ -46,7 +46,7 @@
         <section class="AI-setting">
             <h2 class="custom-page">AI設定(デフォルト)</h2>
             <p class="custom-page">AI機能の出力形式や出力レベルを設定できます</p>
-            <div class="form-group">
+            <div class="custum-page-form-group">
                 <label for="response-mode">AI出力フォーマット</label>
                 <select id="response-mode" name="ai_answer_flag" >
                     <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>

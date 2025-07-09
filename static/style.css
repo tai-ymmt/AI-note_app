@@ -328,17 +328,17 @@ body.dark-mode p {
     color: #cdcdcd;
 }
 
-.form-group {
+.custum-page-form-group {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.custum-page-form-group label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
-.form-group select {
+.custum-page-form-group select {
     width: 200px;
     padding: 6px;
     font-size: 16px;
