@@ -12,29 +12,29 @@
     </header>
     <script> /*ヘッダーの色変更js*/
         if (window.location.pathname.includes("custom")) {
-        document.querySelector(".setting-actions").style.backgroundColor = "#fff";
-        document.querySelector(".setting-link").style.color = "#fff";
+        document.querySelector(".setting-actions").style.backgroundColor = "#d6a9ca";
+        document.querySelector(".setting-link").style.color = "#a5229c";
         }
     </script>
     <div class="custom-title">
         <a href="{{ url_for('index') }}" class="back-link">戻る</a>
-        <h1>設定</h1>
+        <h1>⚙️設定</h1>
     </div>
-    <main>
+    <main class="custom-page">
         <section class="user-info">
-            <h2>ユーザー情報</h2>
-            <p>現在ログインしているユーザーの情報です</p>
-            <p>ユーザーID</p>
-            <p><strong>{{ current_user.user_id }}</strong></p>
-            <a href="パスワード変更画面へのpath">
+            <h2 class="custom-page">ユーザー情報</h2>
+            <p class="custom-page">現在ログインしているユーザーの情報です</p>
+            <p class="custom-page">ユーザーID</p>
+            <p class="custom-page"><strong>{{ current_user.user_id }}</strong></p>
+            <a href="{{ url_for('changePassword') }}">
                 <span class="pathward-chenge-link">パスワードを変更</span>
             </a>
         </section>
 
         <section class="theme-setting">
-            <h2>テーマ設定</h2>
-            <p>アプリの表示テーマを設定できます</p>
-            <div class="form-group">
+            <h2 class="custom-page">テーマ設定</h2>
+            <p class="custom-page">アプリの表示テーマを設定できます</p>
+            <div class="custum-page-form-group">
                 <label for="theme-select">テーマ</label>
                 <select id="theme" name="mode_flag">
                     <option value="1" {% if current_user.mode_flag == 1 %}selected{% endif %}>ライトモード</option>
@@ -44,9 +44,9 @@
         </section>
 
         <section class="AI-setting">
-            <h2>AI設定(デフォルト)</h2>
-            <p>AI機能の出力形式や言語レベルを設定できます</p>
-            <div class="form-group">
+            <h2 class="custom-page">AI設定(デフォルト)</h2>
+            <p class="custom-page">AI機能の出力形式や出力レベルを設定できます</p>
+            <div class="custum-page-form-group">
                 <label for="response-mode">AI出力フォーマット</label>
                 <select id="response-mode" name="ai_answer_flag" >
                     <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
@@ -99,15 +99,6 @@ document.getElementById('save-setting').addEventListener('click', function () {
             ai_answer_flag: parseInt(ai_answer_flag),
             ai_level_flag: parseInt(ai_level_flag)
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("設定を保存しました");
-            location.reload();
-        } else {
-            alert("保存に失敗しました");
-        }
     });
 });
 </script>

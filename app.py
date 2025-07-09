@@ -303,8 +303,7 @@ def save_setting():
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
 def changePassword():
-    form = ChangePasswordForm()
-    
+    form = ChangePasswordForm()    
     if form.validate_on_submit():
         # 現在のパスワードチェック
         if not check_password_hash(current_user.password, form.now_password.data):
@@ -326,6 +325,8 @@ def changePassword():
     return render_template('change_pass.html',form=form)
 
 
+
 # ----------- アプリ起動 -----------
+
 if __name__ == '__main__':
     app.run(debug=True)

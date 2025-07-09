@@ -1,9 +1,7 @@
 <div class="app-header">
     <div class="app-icon">
-        <a href="一覧画面へのpath" class="icon">
-            <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
-                <rect x="10" y="10" width="180" height="40" rx="10" ry="10" fill="purple" />
-            </svg>
+        <a href="{{ url_for('index') }}" class="icon">
+            <img src="{{ url_for('static', filename='images/AI-note-icon-light.png' )}}" alt="AI Note Icon" class="icon-image">
         </a>
     </div>
     <a href="{{ url_for('settings_page') }}" class="setting-actions">
