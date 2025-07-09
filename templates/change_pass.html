@@ -10,16 +10,8 @@
 <div class="login-container">
     <a href="/custom" class="move_custom"><div>←設定に戻る</div></a>
     <h2 class="access_page">パスワード変更</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <p class="message">{{ message }}</p>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
     <form method="POST">
         {{ form.hidden_tag() }}
-
         <p class="form-group password-wrapper">
             {{ form.now_password.label }}<br>
             {{ form.now_password(class="acces_area",id="password",size=16) }}
@@ -31,25 +23,32 @@
                     {% endfor %}
                 </div>
             {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="message">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
         </p>
 
         <p class="form-group password-wrapper">
             {{ form.changed_password.label }}<br>
             {{ form.changed_password(class="acces_area",id="changed_password",size=16) }}
             <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="changed_password" aria-hidden="true"></i>
+        </p>
+        <p class="form-group password-wrapper">
+            {{ form.changed_confirm.label }}<br>
+            {{ form.changed_confirm(class="acces_area",id="changed_confirm",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="changed_confirm" aria-hidden="true"></i>
             {% if form.changed_password.errors %}
                 <div class='message'>
                     {% for error in form.changed_password.errors %}
                         <span>{{ error }}</span>
                     {% endfor %}
                 </div>
-            {% endif %}
-        </p>
-        <p class="form-group password-wrapper">
-            {{ form.changed_confirm.label }}<br>
-            {{ form.changed_confirm(class="acces_area",id="changed_confirm",size=16) }}
-            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="changed_confirm" aria-hidden="true"></i>
-            {% if form.changed_confirm.errors %}
+            {% elif form.changed_confirm.errors %}
                 <div class="message">
                     {% for error in form.changed_confirm.errors %}
                         <span>{{ error }}</span>
