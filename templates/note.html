@@ -58,7 +58,7 @@
       <!-- AI検索の入力欄 -->
       <div class="ai-search-section">
         <div class="search-input-wrapper">
-          <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="20" required />
+          <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="100" required />
           <button class="search-btn" aria-label="AI検索"><i class="fas fa-search"></i></button>
         </div>
       </div>
@@ -249,13 +249,38 @@
         pendingBack = false;
         unsavedConfirmModal.classList.remove('is-visible');
       });
-      confirmUnsavedBtn.addEventListener('click', () => {
-        unsavedConfirmModal.classList.remove('is-visible');
-        if (pendingBack) {
-          window.location.href = '/';
-          pendingBack = false;
-        }
-      });
+
+// 画面遷移用イベント捕捉（<a>タグの通常遷移、button[data-navigate]のクリック）
+document.body.addEventListener('click', function(e) {
+  const a = e.target.closest('a');
+  if (a && a.getAttribute('href') && !a.getAttribute('target') && a.getAttribute('href').charAt(0) === '/') {
+    // ノート一覧ボタンは既存の処理でOK
+    if (a.id === 'back-btn') return;
+    if (isEdited) {
+      e.preventDefault();
+      pendingBack = true;
+      unsavedConfirmModal.dataset.nextUrl = a.href;
+      unsavedConfirmModal.classList.add('is-visible');
+    }
+  }
+});
+
+// 破棄して遷移
+confirmUnsavedBtn.addEventListener('click', () => {
+  unsavedConfirmModal.classList.remove('is-visible');
+  if (pendingBack) {
+    if (unsavedConfirmModal.dataset.nextUrl) {
+      window.location.href = unsavedConfirmModal.dataset.nextUrl;
+      unsavedConfirmModal.dataset.nextUrl = '';
+    } else {
+      window.location.href = '/';
+    }
+    pendingBack = false;
+  }
+});
+
+
+
       unsavedConfirmModal.addEventListener('click', (e) => {
         if (e.target === unsavedConfirmModal) {
           pendingBack = false;
@@ -333,17 +358,16 @@
         .then(data => {
             aiLoading.style.display = 'none';
             aiOutput.innerHTML = `
-                <div id="ai-output-text" style="margin-bottom: 1em;">${data.result || '検索結果なし'}</div>
+                <div id="ai-output-text" style="margin-bottom: 1em;">${marked.parse(data.result || '検索結果なし')}</div>
                 <button id="paste-to-note-btn" class="btn btn-save" style="margin-top: 0.4em;"><i class="fas fa-clipboard"></i> 貼り付け</button>
             `;
             aiOutput.style.display = 'block';
             // AI出力をノートに貼り付ける
             document.getElementById('paste-to-note-btn').addEventListener('click', () => {
-                const aiOutputText = document.getElementById('ai-output-text').innerText;
-                const html = marked.parse(aiOutputText);
+                const aiOutputText = document.getElementById('ai-output-text').innerHTML;;
                 const editor = document.querySelector('.rich-editor');
                 editor.innerHTML += `<br>${aiOutputText}`;
-                isEdited = true; // AI貼り付けも編集扱い
+                isEdited = true; 
                 showToast('AI出力をノートに貼り付けました');
             });
         })

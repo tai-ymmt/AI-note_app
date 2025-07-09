@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">   
+
+    <title>マイページ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+</html>
+
     <title>ノート一覧</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -11,6 +17,7 @@
     <!-- 以下、ノート一覧画面 -->
     {% include "header.html" %}
 </head>
+
 <body style="margin: 0; padding: 0;">
     <div style="max-width: 90%; margin: 0 auto; padding: 0 32px; box-sizing: border-box;">
         <h1>ノート一覧</h1>

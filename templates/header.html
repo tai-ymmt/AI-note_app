@@ -1,7 +1,6 @@
 <div class="app-header">
     <div class="app-icon">
-          <!--<a href="一覧画面へのpath" class="icon">　-->
-        <a href="{{ url_for('index') }}" class="icon" data-unsaved-check></a>
+        <a href="一覧画面へのpath" class="icon">
             <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
                 <rect x="10" y="10" width="180" height="40" rx="10" ry="10" fill="purple" />
             </svg>
@@ -23,3 +22,13 @@
         }
     }
 </script>
+<nav>
+    <a href="{{ url_for('index') }}">ホーム</a>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('changePassword') }}">パスワード変更</a>
+        <a href="{{ url_for('logout') }}">ログアウト</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">ログイン</a>
+        <a href="{{ url_for('newUser') }}">新規登録</a>
+    {% endif %}
+</nav>
