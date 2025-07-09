@@ -263,7 +263,7 @@ def newUser():
         db.session.add(new_user)
         db.session.commit()
         
-        flash('ユーザー登録が完了しました。ログインしてください。','danger')
+        flash('ユーザー登録が完了しました。ログインしてください。','success')
         return redirect(url_for('login'))  # login ページにリダイレクト
     
     return render_template('new_user.html', form=form)
