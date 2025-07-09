@@ -5,5 +5,5 @@ mysqlclient
 wtforms
 flask-wtf
 
-pip install google-generativeai
-pip install -q -U google-genai
+google-generativeai
+google-genai
