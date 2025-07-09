@@ -4,3 +4,7 @@ Flask-SQLAlchemy
 mysqlclient
 wtforms
 flask-wtf
+
+#AI関連
+google-generativeai
+google-genai
