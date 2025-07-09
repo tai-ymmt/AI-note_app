@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import check_password_hash
 from config import Config
 from models import db, User, Note
-from forms import LoginForm, NewUserForm
+from forms import LoginForm, NewUserForm, ChangePasswordForm
 from datetime import datetime
 
 # Google Gemini API 用の設定
