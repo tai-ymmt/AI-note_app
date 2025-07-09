@@ -14,7 +14,12 @@
 </head>
 <body>
   <!-- サイト共通ヘッダーの読み込み -->
-  {% include "header.html" %}
+   <header>
+        {% include "header.html" %}
+   </header>
+   
+
+  
 
   <!-- 画面上部の操作バー（戻る・保存・削除） -->
   <div class="top-bar">
@@ -324,7 +329,7 @@ confirmUnsavedBtn.addEventListener('click', () => {
         fetch(`/note/${noteId}/delete`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
-            // 削除成功時、ノート一覧画面に通知内容をパラメータで渡して遷移
+            // 削除成功時、ノート一覧画面に通知を渡して遷移
             window.location.href = '/?toast=' + encodeURIComponent(data.message || 'ノートを削除しました');
             })
             .catch(() => showToast('ノートの削除に失敗しました'));
