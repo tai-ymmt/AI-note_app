@@ -42,9 +42,6 @@
         <button class="toolbar-btn" data-command="insertOrderedList" title="番号付きリスト"><i class="fas fa-list-ol"></i></button>
         <button class="toolbar-btn" data-command="insertUnorderedList" title="箇条書き"><i class="fas fa-list-ul"></i></button>
         <span class="toolbar-separator"></span>
-        <button class="toolbar-btn" data-command="formatBlock" data-value="blockquote" title="引用"><i class="fas fa-quote-left"></i></button>
-        <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
-        <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
       </div>
       <!-- 本文のリッチテキストエディタ -->
       <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
@@ -94,12 +91,12 @@
       <div class="modal-body">
         <p style="margin: 1em 0 2em; line-height: 1.6;">
           保存されていない変更があります。<br>
-          破棄してノート一覧に戻りますか？
+          破棄して画面を移りますか？
         </p>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" id="cancel-unsaved-btn">キャンセル</button>
-        <button type="button" class="btn btn-delete" id="confirm-unsaved-btn">破棄して戻る</button>
+        <button type="button" class="btn btn-delete" id="confirm-unsaved-btn">破棄して移る</button>
       </div>
     </div>
   </div>
@@ -141,9 +138,9 @@
         <div class="modal-form-group">
           <label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
           <select id="target-level" class="modal-select">
-            <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
-            <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
-            <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
+            <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初級</option>
+            <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>中級</option>
+            <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>上級</option>
           </select>
         </div>
         <div class="modal-actions">
@@ -325,14 +322,15 @@ confirmUnsavedBtn.addEventListener('click', () => {
       });
       confirmDeleteBtn.addEventListener('click', () => {
         fetch(`/note/${noteId}/delete`, { method: 'POST' })
-          .then(res => res.json())
-          .then(data => {
-            showToast(data.message || 'ノートを削除しました。');
-            setTimeout(() => window.location.href = '/', 1200);
-          })
-          .catch(() => showToast('ノートの削除に失敗しました'));
+            .then(res => res.json())
+            .then(data => {
+            // 削除成功時、ノート一覧画面に通知内容をパラメータで渡して遷移
+            window.location.href = '/?toast=' + encodeURIComponent(data.message || 'ノートを削除しました');
+            })
+            .catch(() => showToast('ノートの削除に失敗しました'));
         deleteConfirmModal.classList.remove('is-visible');
-      });
+        });
+
       
       // ===== AI検索ボタン処理 =====
       document.querySelector('.search-btn').addEventListener('click', () => {
