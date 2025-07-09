@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body>
+<body class="custom-page {{ 'light-mode' if current_user.mode_flag == 1 else 'dark-mode' }}">
 <header>  {% include "header.html" %}</header>
 <div class="login_body">
     <div class="login-container">

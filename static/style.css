@@ -8,7 +8,10 @@ body {
     color: #222; min-height: 100vh;
     position: relative; 
 }
+body.dark-mode {
+    background: linear-gradient(120deg, #1a1a1a 60%, #2a2a40 100%);
 
+}
 /*ユーザー情報入力ページデザイン*/
 div.login_body {
     display: flex;
@@ -351,39 +354,3 @@ select#response-level {
     margin-left: 700px;
 }
 
-body.dark-mode {
-    background-color: #312e2e;
-    color: rgb(0, 0, 0);
-}
-
-body.dark-mode .app-header {
-    background: #525252;
-}
-
-body.dark-mode section {
-    background-color: #545454;
-}
-
-body.dark-mode h2 {
-    color: #ffffff;
-}
-
-body.dark-mode p {
-    color: #cdcdcd;
-}
-
-.custum-page-form-group {
-    margin-bottom: 20px;
-}
-
-.custum-page-form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.custum-page-form-group select {
-    width: 200px;
-    padding: 6px;
-    font-size: 16px;
-}
