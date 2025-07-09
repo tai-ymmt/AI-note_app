@@ -10,10 +10,10 @@ body {
 }
 
 /*ユーザー情報入力ページデザイン*/
-body.login_body {
+div.login_body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
     height: 100vh;
 }
 
@@ -77,9 +77,9 @@ body.login_body {
 /* アイコンの位置 */
 .toggle-icon {
   position: absolute;
-  top: 70%;
-  right: 0;
-  transform: translateY(-125%);
+  top: 50%;
+  right: 10px;
+  transform: translateY(-25%);
   cursor: pointer;
   color: #888;
 }

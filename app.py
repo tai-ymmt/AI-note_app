@@ -142,7 +142,10 @@ def save_note_new_or_edit():
         # 新規作成（DB追加）
         note = Note(user_num=current_user.num)
         db.session.add(note)
-    note.title = data.get('title', '')
+    if data.get('title') == '':
+        note.title = '無題のノート'
+    else:
+        note.title = data.get('title', '')
     note.content = data.get('content', '')
     note.update_time = datetime.utcnow()
     db.session.commit()
@@ -250,6 +253,7 @@ def newUser():
     
     if User.query.filter_by(user_id=form.user_id.data).first():
         flash('そのユーザーIDは使用されています','danger')
+        form.user_id.data = ''  # 中身をクリア
         return render_template('new_user.html', form=form)
     
     if form.validate_on_submit():
@@ -265,6 +269,9 @@ def newUser():
         
         flash('ユーザー登録が完了しました。ログインしてください。','success')
         return redirect(url_for('login'))  # login ページにリダイレクト
+    
+    form.user_id.data = ''  # 中身をクリア
+
     
     return render_template('new_user.html', form=form)
 
@@ -307,12 +314,12 @@ def changePassword():
     if form.validate_on_submit():
         # 現在のパスワードチェック
         if not check_password_hash(current_user.password, form.now_password.data):
-            flash('現在のパスワードが正しくありません','danger')
+            flash('現在のパスワードが正しくありません','now')
             return render_template('change_pass.html', form=form)
         
         #現在と一致している場合エラー
         if check_password_hash(current_user.password, form.changed_password.data):
-            flash('新しいパスワードが現在のパスワードと同じです','danger')
+            flash('新しいパスワードが現在のパスワードと同じです','new')
             return render_template('change_pass.html', form=form)
         
         current_user.password = generate_password_hash(form.changed_password.data)
