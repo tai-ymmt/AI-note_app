@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <title>ログイン</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
-<body>
-<div class="login-container">
+<body class="login_body">
+  <div class="login-container">
     <h2 class="access_page">ログイン</h2>
     <p class="access_label">アカウントにログインしてノートを管理しましょう</p>
 
@@ -16,12 +17,13 @@
 
         <p>
             {{ form.user_id.label }}<br>
-            {{ form.user_id(size=20) }}<br>
+            {{ form.user_id(class="acces_area",size=20) }}<br>
         </p>
 
-        <p>
+        <p class="form-group password-wrapper">
             {{ form.password.label }}<br>
-            {{ form.password(size=16) }}<br>
+            {{ form.password(class="acces_area",id="password",size=16) }}
+            <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="password" aria-hidden="true"></i>
         </p>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -37,6 +39,8 @@
     </form>
     <p class="access_label">アカウントをお持ちでない方は<a href="{{ url_for('newUser') }}">こちら</a></p>
   </div>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
 
