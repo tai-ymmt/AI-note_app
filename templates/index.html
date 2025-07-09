@@ -1,20 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">   
 
     <title>マイページ</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <header>
-            {% include "header.html" %}
-    </header>
-    <main>
-    <h1>ようこそ、{{ name }} さん</h1>
-    <p><a href="{{ url_for('logout') }}">ログアウト</a></p>
-    </main>
-</body>
 </html>
 
     <title>ノート一覧</title>
@@ -26,6 +17,7 @@
     <!-- 以下、ノート一覧画面 -->
     {% include "header.html" %}
 </head>
+
 <body style="margin: 0; padding: 0;">
     <div style="max-width: 90%; margin: 0 auto; padding: 0 32px; box-sizing: border-box;">
         <h1>ノート一覧</h1>
@@ -41,7 +33,7 @@
             <!-- 検索ボタン -->
             <button type="submit" class="ichiran-search-btn" style="font-size: 1.0em; margin-left: 1%;"><i class="fas fa-search"></i></button>
             <!-- 並び順プルダウン -->
-            <select name="order" class="modal-select" style="margin-left: 2%; font-size: 1.0em; background-color: #fff" onchange="this.form.submit()">
+            <select name="order" class="ichiran-modal-select" style="margin-left: 2%; font-size: 1.0em; background-color: #fff" onchange="this.form.submit()">
                 {% for o in orders %}
                     <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
                 {% endfor %}
@@ -115,14 +107,11 @@
     <div id="toast"></div>
 
     <script>
-    // 新規ノート作成ボタンのクリックイベント（この関数は削除して山本くんのやつに合わせるのがいい）
+    // 新規ノート作成ボタンのクリックイベント（
     document.getElementById('create-note-btn').addEventListener('click', function() {
-      fetch('/note/create', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
+
           // 作成後、そのノートの編集画面へ移動
-          window.location.href = '/note/' + data.note_id;
-        });
+          window.location.href = '/note/new';
     });
 
     // 検索欄の入力クリアボタンの表示制御
@@ -187,4 +176,3 @@
     }
     
     </script>
-

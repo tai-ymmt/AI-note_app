@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ノート編集 - AI Note App</title>
+  <!-- ローカルCSSファイルの読み込み -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Google FontsとFontAwesomeの読み込み -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Markdown→HTML変換用 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</head>
+<body>
+  <!-- サイト共通ヘッダーの読み込み -->
+  {% include "header.html" %}
+
+  <!-- 画面上部の操作バー（戻る・保存・削除） -->
+  <div class="top-bar">
+    <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
+    <div class="top-bar-right">
+      <button class="btn btn-save" id="save-note-btn"><i class="fas fa-save"></i> 保存</button>
+      <button class="btn btn-delete" id="delete-note-btn"><i class="fas fa-trash-alt"></i> 削除</button>
+    </div>
+  </div>
+  
+  <!-- メインの2カラム構成 -->
+  <main class="main-content">
+    <!-- 左：ノート編集エリア -->
+    <section class="editor-section">
+      <div class="note-title-bar">
+        <!-- ノートタイトル入力欄 -->
+        <input type="text" class="note-title-input" placeholder="ノートのタイトルを入力（最大20文字）..." value="{{ note.title }}" maxlength="20" required>
+      </div>
+      <!-- エディタ用ツールバー -->
+      <div class="editor-toolbar">
+        <button class="toolbar-btn" data-command="bold" title="太字"><i class="fas fa-bold"></i></button>
+        <button class="toolbar-btn" data-command="italic" title="斜体"><i class="fas fa-italic"></i></button>
+        <button class="toolbar-btn" data-command="underline" title="下線"><i class="fas fa-underline"></i></button>
+        <span class="toolbar-separator"></span>
+        <button class="toolbar-btn" data-command="insertOrderedList" title="番号付きリスト"><i class="fas fa-list-ol"></i></button>
+        <button class="toolbar-btn" data-command="insertUnorderedList" title="箇条書き"><i class="fas fa-list-ul"></i></button>
+        <span class="toolbar-separator"></span>
+        <button class="toolbar-btn" data-command="formatBlock" data-value="blockquote" title="引用"><i class="fas fa-quote-left"></i></button>
+        <button class="toolbar-btn" data-command="createLink" title="リンク"><i class="fas fa-link"></i></button>
+        <button class="toolbar-btn" data-command="formatBlock" data-value="pre" title="コード"><i class="fas fa-code"></i></button>
+      </div>
+      <!-- 本文のリッチテキストエディタ -->
+      <div class="rich-editor" contenteditable="true" data-placeholder="ここにノート本文を入力してください...">{{ note.content|safe }}</div>
+    </section>
+    <!-- 右：AIサイドバー -->
+    <aside class="ai-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title"><i class="fas fa-robot"></i> AI機能</span>
+        <button class="btn btn-ghost" id="open-ai-settings-btn" aria-label="AI詳細設定"><i class="fas fa-cog"></i></button>
+      </div>
+      <!-- AI検索の入力欄 -->
+      <div class="ai-search-section">
+        <div class="search-input-wrapper">
+          <input type="text" class="search-input" placeholder="検索したいキーワード" maxlength="100" required />
+          <button class="search-btn" aria-label="AI検索"><i class="fas fa-search"></i></button>
+        </div>
+      </div>
+      <!-- AI検索結果・ウェルカム・ローディング -->
+      <div class="ai-results">
+        <div id="ai-loading" style="display: none; text-align:center;">
+          <i class="fas fa-spinner fa-spin"></i> AIの解説を生成中...
+        </div>
+        <div id="ai-output" style="display: none;"></div>
+        <div id="ai-welcome" class="welcome-message">
+          <span class="welcome-icon"><i class="fas fa-lightbulb"></i></span>
+          <h4>AI検索を始めましょう</h4>
+          <p>キーワードを入力してAI検索を開始できます</p>
+          <div class="welcome-features">
+            <div class="feature-item"><i class="fas fa-brain"></i><span>AI要約生成</span></div>
+            <div class="feature-item"><i class="fas fa-search"></i><span>関連情報検索</span></div>
+            <div class="feature-item"><i class="fas fa-plus-circle"></i><span>ワンクリック挿入</span></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+  
+  <!-- トースト通知用（小さな一時メッセージ表示） -->
+  <div id="toast"></div>
+
+  <!-- ノート未保存警告モーダル（戻る時） -->
+  <div id="unsaved-confirm-modal" class="modal-outer">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <span class="modal-title" style="color: #f9a825;"><i class="fas fa-exclamation-circle"></i> 変更を破棄</span>
+      </div>
+      <div class="modal-body">
+        <p style="margin: 1em 0 2em; line-height: 1.6;">
+          保存されていない変更があります。<br>
+          破棄してノート一覧に戻りますか？
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-unsaved-btn">キャンセル</button>
+        <button type="button" class="btn btn-delete" id="confirm-unsaved-btn">破棄して戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ノート削除確認モーダル -->
+  <div id="delete-confirm-modal" class="modal-outer">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <span class="modal-title" style="color: #d64242;"><i class="fas fa-exclamation-triangle"></i> ノートを削除</span>
+      </div>
+      <div class="modal-body">
+        <p style="margin: 1em 0 2em; line-height: 1.6;">
+          本当にこのノートを削除しますか？<br>この操作は元に戻すことはできません。
+        </p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-delete-btn">キャンセル</button>
+        <button type="button" class="btn btn-delete" id="confirm-delete-btn">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI詳細設定モーダル -->
+  <div id="ai-settings-modal" class="modal-outer">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <span class="modal-title"><i class="fas fa-cog"></i> AI詳細設定</span>
+        <button id="close-ai-settings-btn" class="btn-ghost" aria-label="閉じる"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="ai-settings-form">
+        <div class="modal-form-group">
+          <label for="output-format" class="modal-label"><i class="fas fa-file-alt"></i> 出力形式</label>
+          <select id="output-format" class="modal-select">
+            <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
+            <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
+            <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
+          </select>
+        </div>
+        <div class="modal-form-group">
+          <label for="target-level" class="modal-label"><i class="fas fa-graduation-cap"></i> 難易度レベル</label>
+          <select id="target-level" class="modal-select">
+            <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初学者</option>
+            <option value="1" {% if current_user.ai_level_flag == 1 %}selected{% endif %}>普通</option>
+            <option value="2" {% if current_user.ai_level_flag == 2 %}selected{% endif %}>専門的</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-ai-settings-btn">キャンセル</button>
+          <button type="submit" class="btn btn-save">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript部：イベント登録・動的処理 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ===== ツールバーボタン（太字/斜体などの装飾）処理 =====
+      document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const command = btn.getAttribute('data-command');
+          const value = btn.getAttribute('data-value') || null;
+          // リンクの場合はURL入力
+          if (command === "createLink") {
+            const url = prompt("リンク先のURLを入力してください", "https://");
+            if (url) document.execCommand(command, false, url);
+          } else if (command === "formatBlock" && value) {
+            document.execCommand(command, false, value);
+          } else {
+            document.execCommand(command, false, value);
+          }
+          updateToolbarState();
+        });
+      });
+
+      // ボタンのハイライト状態を反映する
+      function updateToolbarState() {
+        const commandMap = {
+          bold: 'bold',
+          italic: 'italic',
+          underline: 'underline',
+          insertOrderedList: 'insertOrderedList',
+          insertUnorderedList: 'insertUnorderedList'
+        };
+        Object.entries(commandMap).forEach(([cmd, query]) => {
+          const btn = document.querySelector(`.toolbar-btn[data-command=\"${cmd}\"]`);
+          if (!btn) return;
+          if (document.queryCommandState(query)) {
+              btn.classList.add('active');
+          } else {
+              btn.classList.remove('active');
+          }
+        });
+      }
+      // エディタへのイベントで状態更新
+      const richEditor = document.querySelector('.rich-editor');
+      ['keyup', 'mouseup', 'click'].forEach(evt => {
+        richEditor.addEventListener(evt, updateToolbarState);
+      });
+      updateToolbarState();
+
+      // ===== DOM要素取得 =====
+      const saveBtn = document.getElementById('save-note-btn');
+      const backBtn = document.getElementById('back-btn');
+      const toast = document.getElementById('toast');
+      let toastTimer = null;
+
+      const aiSettingsModal = document.getElementById('ai-settings-modal');
+      const openAiSettingsBtn = document.getElementById('open-ai-settings-btn');
+      const closeAiSettingsBtn = document.getElementById('close-ai-settings-btn');
+      const cancelAiSettingsBtn = document.getElementById('cancel-ai-settings-btn');
+      const aiSettingsForm = document.getElementById('ai-settings-form');
+      
+      const deleteNoteBtn = document.getElementById('delete-note-btn');
+      const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+      const noteId = {{ note.num | tojson if note else 'null' }};
+      const titleInput = document.querySelector('.note-title-input');
+      const contentEditor = document.querySelector('.rich-editor');
+
+      // ===== 未保存時警告の管理 =====
+      const unsavedConfirmModal = document.getElementById('unsaved-confirm-modal');
+      const cancelUnsavedBtn = document.getElementById('cancel-unsaved-btn');
+      const confirmUnsavedBtn = document.getElementById('confirm-unsaved-btn');
+      let isEdited = false;
+      let pendingBack = false;
+
+      // 入力内容に変化があれば未保存フラグを立てる
+      if (titleInput && contentEditor) {
+        titleInput.addEventListener('input', () => isEdited = true);
+        contentEditor.addEventListener('input', () => isEdited = true);
+      }
+
+      // 戻る時の未保存警告モーダル表示
+      backBtn.addEventListener('click', (e) => {
+        if (isEdited) {
+          e.preventDefault();
+          pendingBack = true;
+          unsavedConfirmModal.classList.add('is-visible');
+          return;
+        }
+        window.location.href = '/';
+      });
+      cancelUnsavedBtn.addEventListener('click', () => {
+        pendingBack = false;
+        unsavedConfirmModal.classList.remove('is-visible');
+      });
+
+// 画面遷移用イベント捕捉（<a>タグの通常遷移、button[data-navigate]のクリック）
+document.body.addEventListener('click', function(e) {
+  const a = e.target.closest('a');
+  if (a && a.getAttribute('href') && !a.getAttribute('target') && a.getAttribute('href').charAt(0) === '/') {
+    // ノート一覧ボタンは既存の処理でOK
+    if (a.id === 'back-btn') return;
+    if (isEdited) {
+      e.preventDefault();
+      pendingBack = true;
+      unsavedConfirmModal.dataset.nextUrl = a.href;
+      unsavedConfirmModal.classList.add('is-visible');
+    }
+  }
+});
+
+// 破棄して遷移
+confirmUnsavedBtn.addEventListener('click', () => {
+  unsavedConfirmModal.classList.remove('is-visible');
+  if (pendingBack) {
+    if (unsavedConfirmModal.dataset.nextUrl) {
+      window.location.href = unsavedConfirmModal.dataset.nextUrl;
+      unsavedConfirmModal.dataset.nextUrl = '';
+    } else {
+      window.location.href = '/';
+    }
+    pendingBack = false;
+  }
+});
+
+
+
+      unsavedConfirmModal.addEventListener('click', (e) => {
+        if (e.target === unsavedConfirmModal) {
+          pendingBack = false;
+          unsavedConfirmModal.classList.remove('is-visible');
+        }
+      });
+      // ノート保存後に未保存フラグを下ろす
+      function markSaved() { isEdited = false; }
+
+      // ===== ノート保存処理 =====
+      saveBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const title = titleInput.value;
+        const content = contentEditor.innerHTML;
+        const url = noteId ? `/note/${noteId}/save` : `/note/save`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content })
+        })
+        .then(res => res.json())
+        .then(data => {
+            showToast(data.message || 'ノートが保存されました');
+            markSaved();
+            // 新規ノートの場合はノート詳細画面に遷移
+            if (!noteId && data.note_id) {
+              setTimeout(() => {
+                window.location.href = `/note/${data.note_id}`;
+              }, 1200);
+            }
+        })
+        .catch(() => showToast('ノートの保存に失敗しました'));
+      });
+
+      // ===== ノート削除処理 =====
+      deleteNoteBtn.addEventListener('click', () => {
+        deleteConfirmModal.classList.add('is-visible');
+      });
+      cancelDeleteBtn.addEventListener('click', () => {
+        deleteConfirmModal.classList.remove('is-visible');
+      });
+      confirmDeleteBtn.addEventListener('click', () => {
+        fetch(`/note/${noteId}/delete`, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            showToast(data.message || 'ノートを削除しました。');
+            setTimeout(() => window.location.href = '/', 1200);
+          })
+          .catch(() => showToast('ノートの削除に失敗しました'));
+        deleteConfirmModal.classList.remove('is-visible');
+      });
+      
+      // ===== AI検索ボタン処理 =====
+      document.querySelector('.search-btn').addEventListener('click', () => {
+        const keyword = document.querySelector('.search-input').value;
+        const aiLoading = document.getElementById('ai-loading');
+        const aiOutput = document.getElementById('ai-output');
+        const aiWelcome = document.getElementById('ai-welcome');
+
+        aiLoading.style.display = 'block';
+        aiOutput.style.display = 'none';
+        aiWelcome.style.display = 'none';
+
+        fetch('/api/ai_search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+            keyword,
+            ai_level_flag: document.getElementById('target-level').value,
+            ai_answer_flag: document.getElementById('output-format').value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            aiLoading.style.display = 'none';
+            aiOutput.innerHTML = `
+                <div id="ai-output-text" style="margin-bottom: 1em;">${marked.parse(data.result || '検索結果なし')}</div>
+                <button id="paste-to-note-btn" class="btn btn-save" style="margin-top: 0.4em;"><i class="fas fa-clipboard"></i> 貼り付け</button>
+            `;
+            aiOutput.style.display = 'block';
+            // AI出力をノートに貼り付ける
+            document.getElementById('paste-to-note-btn').addEventListener('click', () => {
+                const aiOutputText = document.getElementById('ai-output-text').innerHTML;;
+                const editor = document.querySelector('.rich-editor');
+                editor.innerHTML += `<br>${aiOutputText}`;
+                isEdited = true; 
+                showToast('AI出力をノートに貼り付けました');
+            });
+        })
+        .catch(() => {
+            aiLoading.style.display = 'none';
+            aiOutput.style.display = 'block';
+            aiOutput.innerHTML = '<div style="color:#d64242;">AI要約の取得に失敗しました</div>';
+        });
+      });
+
+      // ===== AI詳細設定モーダル操作 =====
+      openAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.add('is-visible'));
+      closeAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
+      cancelAiSettingsBtn.addEventListener('click', () => aiSettingsModal.classList.remove('is-visible'));
+      aiSettingsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        aiSettingsModal.classList.remove('is-visible');
+        showToast('AI設定を保存しました');
+      });
+      // モーダル外クリックで閉じる
+      [aiSettingsModal, deleteConfirmModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('is-visible');
+          }
+        });
+      });
+
+      // ===== トースト通知表示関数 =====
+      function showToast(message) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add('is-visible');
+        toastTimer = setTimeout(() => {
+          toast.classList.remove('is-visible');
+        }, 2500);
+      }
+    });
+  </script>
+</body>
+</html>
