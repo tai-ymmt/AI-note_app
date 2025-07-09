@@ -174,5 +174,15 @@
             toast.classList.remove('is-visible');
         }, 2500);
     }
-    
+
+
+    // 山本追加　ノート編集画面で削除時のトースト表示
+    document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const toastMsg = params.get('toast');
+        if (toastMsg) {
+            showToast(toastMsg);
+            history.replaceState(null, '', location.pathname + location.hash);
+        }
+    });    
     </script>

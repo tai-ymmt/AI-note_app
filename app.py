@@ -171,10 +171,10 @@ def delete_note(note_id):
     """ノートの削除"""
     note = Note.query.get_or_404(note_id)
     if note.user_num != current_user.num:
-        return jsonify({'error': '権限がありません'}), 403
+        return jsonify({'error': '権限がありません', 'success': False}), 403
     db.session.delete(note)
     db.session.commit()
-    return jsonify({'message': '削除しました'})
+    return jsonify({'message': '削除しました', 'success': True})
 
 # ----------- AI要約API（Gemini） -----------
 @app.route('/api/ai_search', methods=['POST'])
@@ -209,7 +209,7 @@ def ai_search():
     prompt = f"{keyword}について{level_text}、{format_text}、前置きはなくして日本語で解説してください。"
 
     try:
-        client = genai.Client(api_key=GENAI_API_KEY)
+        #client = genai.Client(api_key=GENAI_API_KEY)
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
