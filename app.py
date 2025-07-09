@@ -196,9 +196,9 @@ def ai_search():
     # 出力形式（ai_answer_flag）: 0=シンプル, 1=詳細, 2=箇条書き
     # 難易度（ai_level_flag）: 0=初学者, 1=普通, 2=専門的
     format_text = {
-        0: "できるだけ簡潔に（要点だけをまとめて200文字程度で）",
-        1: "詳細に、できるだけ具体的に（400文字程度で）",
-        2: "要点をまとめて箇条書きで4行程度で"
+        0: "できるだけ簡潔に（要点だけをまとめて200文字以下で）",
+        1: "詳細に、できるだけ具体的に（400文字以下で）",
+        2: "要点をまとめて箇条書きで4行で"
     }[ai_answer_flag]
     level_text = {
         0: "初心者向けに",
@@ -303,8 +303,7 @@ def save_setting():
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
 def changePassword():
-    form = ChangePasswordForm()
-    
+    form = ChangePasswordForm()    
     if form.validate_on_submit():
         # 現在のパスワードチェック
         if not check_password_hash(current_user.password, form.now_password.data):
@@ -326,6 +325,8 @@ def changePassword():
     return render_template('change_pass.html',form=form)
 
 
+
 # ----------- アプリ起動 -----------
+
 if __name__ == '__main__':
     app.run(debug=True)
