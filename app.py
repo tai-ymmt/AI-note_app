@@ -174,12 +174,12 @@ def save_setting():
     else:
         return render_template('custom.html')
 
+
 #パスワード変更
 @app.route('/changePassword', methods=['GET', 'POST'])
 @login_required
 def changePassword():
-    form = ChangePasswordForm()
-    
+    form = ChangePasswordForm()    
     if form.validate_on_submit():
         # 現在のパスワードチェック
         if not check_password_hash(current_user.password, form.now_password.data):
@@ -199,7 +199,6 @@ def changePassword():
         return redirect(url_for('login'))
     
     return render_template('change_pass.html',form=form)
-
 
 
 if __name__ == '__main__':

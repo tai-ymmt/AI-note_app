@@ -167,7 +167,7 @@ transition: opacity 0.4s;
 .app-header {
     width: 100%; /* 幅いっぱいを指定 */
     height: 50px; /* 高さを50pxに指定 */
-    background: #CCC; /* 背景色にグレーを指定 */ 
+    background: #ffffff; /* 背景色にグレーを指定 */ 
     box-sizing: border-box; /* padding分を含んで幅を100%にするため */
     top: 0; /* 上下の固定位置を上から0pxにする */
     left: 0; /* 左右の固定位置を左から0pxにする */
@@ -188,12 +188,17 @@ transition: opacity 0.4s;
 /* text-decoration: none; リンクの下線を消したかったら*/
 .setting-link {
 text-decoration: none;
-color: #000000;
+color: #d6a9ca;
 font-weight: bold;
 }
 
+.icon-image {
+    width: 100px;
+    height: auto; /* 縦横比を保つ */
+}
+
 /*customページデザイン*/
-body {
+body.custum-page {
     margin: 0;
     padding: 0; 
     background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
@@ -202,15 +207,7 @@ body {
     position: relative; 
 }
 
-body.custom-page {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #e8e1f0;
-    color: #333;
-}
-
 .custom-title {
-    
 display: flex;
     justify-content: space-between;
     align-items: center;
@@ -236,7 +233,7 @@ display: flex;
 }
 
 
-main {
+main.custom-page {
     padding: 40px 20px;
     display: flex;
     flex-direction: column;
@@ -245,26 +242,30 @@ main {
     margin: 0 auto;
 }
 
-section {
+section.user-info,
+section.theme-setting,
+section.AI-setting {
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 30px 40px;
 }
 
-h2 {
+h2.custom-page {
     font-size: 24px;
     margin-bottom: 10px;
     color: #333;
 }
 
-p {
+p.custom-page {
     font-size: 16px;
     margin-bottom: 20px;
     color: #666;
 }
 
-select {
+select#theme,
+select#response-mode,
+select#response-level {
     padding: 10px;
     width: 100%;
     max-width: 300px;
@@ -285,33 +286,25 @@ select {
     cursor: pointer;
 }
 
-#logout-btn,
+#logout-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #d82133;
+    color: white;
+}
+
 #save-setting {
     padding: 12px 24px;
     font-size: 16px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#logout-btn {
-    background-color: #d82133;
-    color: white;
-}
-
-#logout-btn:hover {
-    background-color: #b71c1c;
-}
-
-#save-setting {
     background-color: #800080;
     color: white;
-    margin-left: 0px;
-}
-
-#save-setting:hover {
-    background-color: #5a005a;
+    margin-left: 700px;
 }
 
 body.dark-mode {
