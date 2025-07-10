@@ -12,13 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-
-    <!-- 以下、ノート一覧画面 -->
-    {% include "header.html" %}
 </head>
 
 <body class="custom-page {{ 'light-mode' if current_user.mode_flag == 1 else 'dark-mode' }}">
+    <div class="index-body">
+<!-- 以下、ノート一覧画面 -->
+<body style="margin: 0; padding: 0;">
+    <!-- ヘッダー -->
+    <header>
+        {% include "header.html" %}
+    </header>
     <div class="index-body">
         <h1>ノート一覧</h1>
         <!-- 検索フォーム -->
@@ -122,9 +125,8 @@
     // ページ読み込み時に検索欄の入力クリアボタンの表示状態を更新
     clearbutton();
    
-    // 削除確認モーダルを表示
+   // 削除確認モーダルを表示
     function confirmDeleteCustom(id, title) {
-        console.log("削除確認モーダルを表示");
         document.getElementById('remove-confirm-modal').style.display = 'flex';
         document.getElementById('modal-note-title').textContent = title;
         document.getElementById('confirm-remove-btn').onclick = function() {
@@ -138,9 +140,9 @@
                 }
                 return response.json();
             }).then(data => {
-                setTimeout(() => window.location.reload(), 1200); // 画面を更新
-                showToast(data.message || '削除しました');
-                }).catch(error => {
+                localStorage.setItem('toastMessage', '削除しました'); // トーストメッセージを保存
+                window.location.reload();
+            }).catch(error => {
                 console.error('Error:', error);
                 showToast(error.message);
             });
@@ -164,7 +166,26 @@
         toast.classList.add('is-visible');
         toastTimer = setTimeout(() => {
             toast.classList.remove('is-visible');
-        }, 2500);
+        }, 1200); // 1.2秒後に非表示
     }
-    
+
+    // ページロード時にトーストメッセージを表示
+    window.onload = function() {
+        const toastMessage = localStorage.getItem('toastMessage');
+        if (toastMessage) {
+            showToast(toastMessage);
+            localStorage.removeItem('toastMessage'); // トーストメッセージを削除
+        }
+    }
+
+
+    // 山本追加　ノート編集画面で削除時のトースト表示
+    document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const toastMsg = params.get('toast');
+        if (toastMsg) {
+            showToast(toastMsg);
+            history.replaceState(null, '', location.pathname + location.hash);
+        }
+    });    
     </script>
