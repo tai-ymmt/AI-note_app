@@ -3,7 +3,11 @@
 <div class="app-header">
     <div class="app-icon">
         <a href="{{ url_for('index') }}" class="icon">
-            <img src="{{ url_for('static', filename='images/AI-note-icon-light.png' )}}" alt="AI Note Icon" class="icon-image">
+            {% if current_user.mode_flag == 1: %}
+                <img src="{{ url_for('static', filename='images/AI-note-icon-light.png' )}}" alt="AI Note Icon" class="icon-image">
+            {% else: %}
+                <img src="{{ url_for('static', filename='images/AI-note-icon-dark.png' )}}" alt="AI Note Icon" class="icon-image">
+            {% endif %}
         </a>
     </div>
     <a href="{{ url_for('settings_page') }}" class="setting-actions">
@@ -12,6 +16,6 @@
     </a>
 </div>
 
-<script src="{{ url_for('static', filename='main.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='main.js') }}"></script> -->
 </body>
 </html>

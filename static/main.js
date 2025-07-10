@@ -15,18 +15,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
-//設定リンクの色変更
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.pathname.includes("custom")) {
-    const settingActions = document.querySelector(".setting-actions");
-    const settingLink = document.querySelector(".setting-link");
-
-    if (settingActions) {
-      settingActions.style.setProperty("background-color", "#6c63ff", "important");
-    }
-    if (settingLink) {
-      settingLink.style.setProperty("color", "#fff", "important");
-    }
-  }
-});

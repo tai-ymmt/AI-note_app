@@ -11,14 +11,14 @@
   <!-- Markdown→HTML変換用 -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body>
+<body class="custom-page {{ 'light-mode' if current_user.mode_flag == 1 else 'dark-mode' }}">
   <!-- サイト共通ヘッダーの読み込み -->
    <header>
         {% include "header.html" %}
    </header>
   <!-- 画面上部の操作バー（戻る・保存・削除） -->
   <div class="top-bar">
-    <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i> ノート一覧</button>
+    <button class="note-back-btn" id="back-btn" aria-label="ノート一覧に戻る"><i class="fas fa-arrow-left"></i>ノート一覧</button>
     <div class="top-bar-right">
       <button class="btn btn-save" id="save-note-btn"><i class="fas fa-save"></i> 保存</button>
       <button class="btn btn-delete" id="delete-note-btn"><i class="fas fa-trash-alt"></i> 削除</button>

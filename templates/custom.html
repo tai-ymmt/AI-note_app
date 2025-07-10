@@ -10,12 +10,6 @@
     <header>
             {% include "header.html" %}
     </header>
-    <script> /*ヘッダーの色変更js*/
-        if (window.location.pathname.includes("custom")) {
-        document.querySelector(".setting-actions").style.backgroundColor = "#d6a9ca";
-        document.querySelector(".setting-link").style.color = "#a5229c";
-        }
-    </script>
     <div class="custom-title">
         <a href="#" class="back-link">戻る</a>
     </div>
@@ -79,28 +73,6 @@
             </div>
         </div>
     </main>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const logoutBtn = document.getElementById("custom-logout-btn");
-    const modal = document.getElementById("custom-logout-modal");
-    const confirmBtn = document.getElementById("custom-confirm-logout");
-    const cancelBtn = document.getElementById("custom-cancel-logout");
-
-    logoutBtn.addEventListener("click", function () {
-      modal.style.display = "flex";
-    });
-
-    cancelBtn.addEventListener("click", function () {
-      modal.style.display = "none";
-    });
-
-    confirmBtn.addEventListener("click", function () {
-      window.location.href = "/logout";
-    });
-  });
-</script>
 
 <script>
 document.getElementById('theme').addEventListener('change', function () {
