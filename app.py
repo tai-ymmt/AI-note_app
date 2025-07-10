@@ -215,7 +215,12 @@ def ai_search():
         2: "専門家向けに"
     }[ai_level_flag]
 
-    prompt = f"{keyword}について{level_text}、{format_text}、前置きはなくして日本語で解説してください。"
+    prompt = (
+        f"{keyword}について{level_text}、{format_text}、"
+        "前置きはなくして日本語で解説してください。"
+        "また、特定の性別・文化・国籍・年齢・立場などに偏った表現やステレオタイプを避け、"
+        "公平かつ中立的な立場から分かりやすくまとめてください。"
+    )
 
     try:
         #client = genai.Client(api_key=GENAI_API_KEY)
