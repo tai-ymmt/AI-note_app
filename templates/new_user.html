@@ -40,18 +40,18 @@
             {{ form.confirm.label }}<br>
             {{ form.confirm(class="acces_area",id="confirm",size=16) }}
             <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="confirm" aria-hidden="true"></i>
+        </p>
+        <p>
             {% if form.password.errors %}
                 {% for error in form.password.errors %}
                     <span class="message">{{ error }}</span>
                 {% endfor %}
-            
             {% elif form.confirm.errors %}
                 {% for error in form.confirm.errors %}
                     <span class="message">{{ error }}</span>
                 {% endfor %}
             {% endif %}
-        </p>
-
+        </p>        
         <p>{{form.submit(class="access_btn")}}</p>
     </form>
     <p class="access_label">アカウントをお持ちの方は<a href="{{ url_for('login') }}">こちら</a></p>
