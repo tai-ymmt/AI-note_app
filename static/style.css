@@ -138,31 +138,41 @@ input::-webkit-clear-button {
     padding-right: 2em;
     background-color: #fff;
 } */
-.ichiran-search-input { 
-    font-size: 1em; 
-    padding: 0.5em 1em;
-    width: 40%; 
-    border-radius: 7px;
-    min-width: 150px;
-    max-width: 50%;
-    border: 1px solid #eceafd; 
-    background: #fff; 
-    outline: none; 
-    transition: border 0.18s; 
+.ichiran-search-input {
+  width: 100%;
+  font-size: 1.1em;
+  padding: 0.6em 2.2em 0.6em 1em; /* 右に余白（✕用） */
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  box-sizing: border-box;
 }
-
+.search-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 50%;
+}
+.flex-spacer {
+  flex: 1;
+}
 #clear-btn {
-    display: none;
-    position: absolute;
-    right: 56%;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: transparent;
-    font-size: 1.2em;
-    cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 1.2em;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
 }
-
+.create-note-btn {
+  font-size: 1em;
+  margin-right: 0;
+}
 .ichiran-search-btn {
     font-size: 1.0em;
     margin-left: 1%;
@@ -829,10 +839,10 @@ body.dark-mode .search-btn,
 body.dark-mode .btn-ghost,
 body.dark-mode #save-setting {
     background: #262348;
-    color: #fff;
+    color: #9c88d3;
 }
 body.dark-mode .btn-save:hover {
-    background: #3730a3;
+    background: #807ad0;
 }
 body.dark-mode .btn-delete,
 body.dark-mode #logout-btn {

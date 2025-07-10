@@ -23,24 +23,24 @@
         <h1>ノート一覧</h1>
         <!-- 検索フォーム -->
         <form method="post" class="index-form">
-            <!-- 検索入力欄 -->
+        <div class="search-wrapper">
             <input type="text" class="ichiran-search-input" id="searchword" name="searchword"
-                placeholder="ノートを検索（タイトル・内容）" value="{{ searchword }}"
-                oninput="clearbutton()">
-            <!-- 入力クリアボタン -->
+            placeholder="ノートを検索（タイトル・内容）" value="{{ searchword }}"
+            oninput="clearbutton()">
             <button type="button" id="clear-btn" onclick="clearsearch()">✕</button>
-            <!-- 検索ボタン -->
-            <button type="submit" class="ichiran-search-btn"><i class="fas fa-search"></i></button>
-            <!-- 並び順プルダウン -->
-            <select name="order" class="ichiran-modal-select" onchange="this.form.submit()">
-                {% for o in orders %}
-                    <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
-                {% endfor %}
-            </select>
-            <!-- 右寄せ用スペース -->
-            <span style="flex: 1;"></span>
-            <!-- 新規ノート作成ボタン -->
-            <button type="button" id="create-note-btn" class="btn btn-save" style="font-size: 1.0em; margin-right: 0%;">＋ 新規ノート</button>
+        </div>
+
+        <button type="submit" class="ichiran-search-btn"><i class="fas fa-search"></i></button>
+
+        <select name="order" class="ichiran-modal-select" onchange="this.form.submit()">
+            {% for o in orders %}
+            <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
+            {% endfor %}
+        </select>
+
+        <span class="flex-spacer"></span>
+
+        <button type="button" id="create-note-btn" class="btn btn-save create-note-btn">＋ 新規ノート</button>
         </form>
         <!-- ノート件数表示 -->
         <p class="note-count">{{ len }}件のノート</p>
