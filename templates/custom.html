@@ -10,12 +10,6 @@
     <header>
             {% include "header.html" %}
     </header>
-    <script> /*ヘッダーの色変更js*/
-        if (window.location.pathname.includes("custom")) {
-        document.querySelector(".setting-actions").style.backgroundColor = "#d6a9ca";
-        document.querySelector(".setting-link").style.color = "#a5229c";
-        }
-    </script>
     <div class="custom-title">
         <a href="javascript:history.back();" class="back-link">戻る</a>
     </div>
@@ -52,7 +46,7 @@
                     <option value="0" {% if current_user.ai_answer_flag == 0 %}selected{% endif %}>シンプル</option>
                     <option value="1" {% if current_user.ai_answer_flag == 1 %}selected{% endif %}>詳細</option>
                     <option value="2" {% if current_user.ai_answer_flag == 2 %}selected{% endif %}>箇条書き</option>
-                </select><br><br>
+                </select>
                 <label for="response-level">出力レベル</label>
                 <select id="response-level" name="ai_level_flag">
                     <option value="0" {% if current_user.ai_level_flag == 0 %}selected{% endif %}>初級</option>
@@ -79,28 +73,6 @@
             </div>
         </div>
     </main>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const logoutBtn = document.getElementById("custom-logout-btn");
-    const modal = document.getElementById("custom-logout-modal");
-    const confirmBtn = document.getElementById("custom-confirm-logout");
-    const cancelBtn = document.getElementById("custom-cancel-logout");
-
-    logoutBtn.addEventListener("click", function () {
-      modal.style.display = "flex";
-    });
-
-    cancelBtn.addEventListener("click", function () {
-      modal.style.display = "none";
-    });
-
-    confirmBtn.addEventListener("click", function () {
-      window.location.href = "/logout";
-    });
-  });
-</script>
 
 <script>
 document.getElementById('theme').addEventListener('change', function () {

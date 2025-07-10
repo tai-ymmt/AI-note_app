@@ -650,10 +650,12 @@ input::-webkit-clear-button {
 }
 
 .setting-actions {
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
     padding: 8px 12px;
-    background-color: #f0f0f0;
+    background: #6c63ff; 
+    color: #fff; 
     border-radius: 12px;
     border: 1px solid #ccc;
     gap: 8px;
@@ -667,7 +669,7 @@ input::-webkit-clear-button {
 /* text-decoration: none; リンクの下線を消したかったら*/
 .setting-link {
 text-decoration: none;
-color: #d6a9ca;
+color: #fff;
 font-weight: bold;
 }
 
@@ -680,8 +682,16 @@ font-weight: bold;
     height: auto; /* 縦横比を保つ */
 }
 
-/*customページデザイン*/
 
+/*customページデザイン*/
+body.custom-page {
+    margin: 0;
+    padding: 0; 
+    background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    color: #222; min-height: 100vh;
+    position: relative; 
+} 
 
 .custom-title {
   position: relative;
@@ -793,6 +803,82 @@ select#response-level {
 
 
 
+.custum-page-form-group {
+    margin-bottom: 20px;
+}
+
+.custum-page-form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.custum-page-form-group select {
+    width: 200px;
+    padding: 6px;
+    font-size: 16px;
+}
+
+.custom-modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-modal-box {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.custom-modal-actions {
+  margin-top: 20px;
+}
+
+.custom-modal-actions button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #6c63ff;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.custom-modal-actions button:hover {
+  background-color: #594cf5;
+}
+
+#custom-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #323232;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 9999;
+}
+#custom-toast.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+
 /*以下ダークモード設定*/
 /* ダークモード切り替え用 - 共通 */
 body.dark-mode,
@@ -854,7 +940,8 @@ body.dark-mode .btn-save,
 body.dark-mode .ichiran-search-btn,
 body.dark-mode .search-btn,
 body.dark-mode .btn-ghost,
-body.dark-mode #save-setting {
+body.dark-mode #save-setting,
+body.dark-mode #custom-cancel-logout {
     background: #262348;
     color: #9c88d3;
 }
@@ -862,7 +949,9 @@ body.dark-mode .btn-save:hover {
     background: #807ad0;
 }
 body.dark-mode .btn-delete,
-body.dark-mode #logout-btn {
+body.dark-mode #logout-btn,
+body.dark-mode #custom-confirm-logout,
+body.dark-mode #custom-logout-btn {
     background: #4d2c2c;
     color: #f0b0b0;
     border-color: #7f3f3f;
@@ -899,7 +988,8 @@ body.dark-mode .modal-title {
     color: #ff6f6f;
 }
 body.dark-mode .modal-textarea,
-body.dark-mode .modal-select {
+body.dark-mode .modal-select,
+body.dark-mode .custom-modal-box {
     background: #333;
     color: #fff;
     border: 1px solid #555;
@@ -914,7 +1004,7 @@ body.dark-mode .setting-actions {
     border-color: #555;
 }
 body.dark-mode .setting-link {
-    color: #a7a5ff;
+    color: #9c88d3;
 }
 body.dark-mode .note-back-btn {
     background: #333;
