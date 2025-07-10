@@ -367,61 +367,7 @@ select#response-level {
     margin-left: 700px;
 }
 
-body.dark-mode .custom-page h1{
-color: #ccc;
-}
 
-body.dark-mode {
-    margin: 0;
-    padding: 0; 
-    background: linear-gradient(120deg, #2e2e2e 60%, #2c2d2e 100%);
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    color: #222; min-height: 100vh;
-    position: relative;
-}
-
-body.dark-mode .app-header {
-    background: #525252;
-}
-
-body.dark-mode section {
-    background-color: #545454;
-}
-
-body.dark-mode h2 {
-    color: #ffffff;
-}
-
-body.dark-mode .custom-title h1 {
-    margin: 0;
-    font-size: 35px;
-    color: #bcbcbc;
-    margin-right: 1350px;
-}
-
-body.dark-mode .back-link {
-text-decoration: none;
-    color: #a7a7a7;
-    font-weight: bold;
-    font-size: 35px;
-    padding: 8px 16px;
-    border-radius: 8px;
-}
-body.dark-mode p {
-    color: #cdcdcd;
-}
-
-body.dark-mode label[for="theme-select"] {
-    color: #fff;
-}
-
-body.dark-mode label[for="response-mode"] {
-    color: #fff;
-}
-
-body.dark-mode label[for="response-level"] {
-    color: #fff;
-}
 
 .custum-page-form-group {
     margin-bottom: 20px;
