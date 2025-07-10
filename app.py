@@ -142,10 +142,12 @@ def save_note_new_or_edit():
         # 新規作成（DB追加）
         note = Note(user_num=current_user.num)
         db.session.add(note)
-    if data.get('title') == '':
-        note.title = '無題のノート'
-    else:
-        note.title = data.get('title', '')
+
+    title = data.get('title', '').strip()
+    if not title:
+        title = '無題のノート'
+    note.title = title
+
     note.content = data.get('content', '')
     note.update_time = datetime.utcnow()
     db.session.commit()
@@ -161,7 +163,12 @@ def save_note(note_id):
     if note.user_num != current_user.num:
         return jsonify({'error': '権限がありません'}), 403
     data = request.json
-    note.title = data.get('title', note.title)
+ 
+    title = data.get('title', '').strip()
+    if not title:
+        title = '無題のノート'
+    note.title = title
+    
     note.content = data.get('content', note.content)
     note.update_time = datetime.utcnow()
     db.session.commit()
@@ -174,10 +181,10 @@ def delete_note(note_id):
     """ノートの削除"""
     note = Note.query.get_or_404(note_id)
     if note.user_num != current_user.num:
-        return jsonify({'error': '権限がありません'}), 403
+        return jsonify({'error': '権限がありません', 'success': False}), 403
     db.session.delete(note)
     db.session.commit()
-    return jsonify({'message': '削除しました'})
+    return jsonify({'message': '削除しました', 'success': True})
 
 # ----------- AI要約API（Gemini） -----------
 @app.route('/api/ai_search', methods=['POST'])
@@ -199,9 +206,9 @@ def ai_search():
     # 出力形式（ai_answer_flag）: 0=シンプル, 1=詳細, 2=箇条書き
     # 難易度（ai_level_flag）: 0=初学者, 1=普通, 2=専門的
     format_text = {
-        0: "できるだけ簡潔に（要点だけをまとめて200文字程度で）",
-        1: "詳細に、できるだけ具体的に（400文字程度で）",
-        2: "要点をまとめて箇条書きで4行程度で"
+        0: "できるだけ簡潔に（要点だけをまとめて200文字以下で）",
+        1: "詳細に、できるだけ具体的に（400文字以下で）",
+        2: "要点をまとめて箇条書きで4行で"
     }[ai_answer_flag]
     level_text = {
         0: "初心者向けに",
@@ -209,10 +216,15 @@ def ai_search():
         2: "専門家向けに"
     }[ai_level_flag]
 
-    prompt = f"{keyword}について{level_text}、{format_text}、前置きはなくして日本語で解説してください。"
+    prompt = (
+        f"{keyword}について{level_text}、{format_text}、"
+        "前置きはなくして日本語で解説してください。"
+        "また、特定の性別・文化・国籍・年齢・立場などに偏った表現やステレオタイプを避け、"
+        "公平かつ中立的な立場から分かりやすくまとめてください。"
+    )
 
     try:
-        client = genai.Client(api_key=GENAI_API_KEY)
+        #client = genai.Client(api_key=GENAI_API_KEY)
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt
