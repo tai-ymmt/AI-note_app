@@ -410,20 +410,30 @@ select#response-level {
   margin-top: 20px;
 }
 
-.custom-modal-actions button {
-  margin: 0 10px;
-  padding: 10px 20px;
+#custom-confirm-logout {
+  background-color: #e53935;  /* 背景色：赤 */
+  color: white;               /* 文字色：白 */
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 5px;
   cursor: pointer;
-  background-color: #6c63ff;
-  color: white;
-  transition: background-color 0.2s;
 }
 
-.custom-modal-actions button:hover {
-  background-color: #594cf5;
+#custom-confirm-logout:hover {
+  background-color: #c62828;
+}
+
+#custom-cancel-logout {
+  background-color: #6c63ff;  /* 背景色：グレー */
+  color: white;               
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#custom-cancel-logout:hover {
+  background-color: #6058fb;
 }
 
 #custom-toast {
