@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash
 from config import Config
 from models import db, User, Note
 from forms import LoginForm, NewUserForm, ChangePasswordForm
-from datetime import datetime
+from datetime import datetime,timedelta
 
 # Google Gemini API 用の設定
 from google import genai
@@ -149,7 +149,7 @@ def save_note_new_or_edit():
     note.title = title
 
     note.content = data.get('content', '')
-    note.update_time = datetime.utcnow()
+    note.update_time = datetime.utcnow() + timedelta(hours=9)
     db.session.commit()
     return jsonify({'message': '保存しました', 'note_id': note.num})
 
@@ -170,7 +170,7 @@ def save_note(note_id):
     note.title = title
     
     note.content = data.get('content', note.content)
-    note.update_time = datetime.utcnow()
+    note.update_time = datetime.utcnow() + timedelta(hours=9)
     db.session.commit()
     return jsonify({'message': '保存しました'})
 
