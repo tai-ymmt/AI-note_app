@@ -17,7 +17,7 @@
         }
     </script>
     <div class="custom-title">
-        <a href="javascript:history.back();" class="back-link">戻る</a>
+        <a href="#" class="back-link">戻る</a>
     </div>
     <main class="custom-page">
         <h1>⚙️設定</h1>
@@ -147,6 +147,21 @@ document.getElementById('save-setting').addEventListener('click', function () {
       toast.classList.remove("show");
     }, 900);
 };
+</script>
+
+<script>
+  document.querySelector('.back-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    sessionStorage.setItem('goBackAfterReload', '-1');
+    location.reload();
+  });
+  window.addEventListener('load', function () {
+    const step = sessionStorage.getItem('goBackAfterReload');
+    if (step !== null) {
+      sessionStorage.removeItem('goBackAfterReload');
+      history.go(parseInt(step, 10));
+    }
+  });
 </script>
 </body>
 </html>
