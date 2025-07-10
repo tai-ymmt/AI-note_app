@@ -122,18 +122,22 @@ document.getElementById('save-setting').addEventListener('click', function () {
 </script>
 
 <script>
-  document.querySelector('.back-link').addEventListener('click', function (e) {
-    e.preventDefault();
-    sessionStorage.setItem('goBackAfterReload', '-1');
-    location.reload();
+
+  document.querySelector('.back-link').addEventListener('click', function (e) {const referer = document.referrer;
+        fetch('/go_back', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ referer: referer })
+        }).then(response => {
+          if (response.ok) {
+            window.location.href = referer;
+          }
+        });
   });
-  window.addEventListener('load', function () {
-    const step = sessionStorage.getItem('goBackAfterReload');
-    if (step !== null) {
-      sessionStorage.removeItem('goBackAfterReload');
-      history.go(parseInt(step, 10));
-    }
-  });
+
+
 </script>
 </body>
 </html>

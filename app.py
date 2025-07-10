@@ -344,7 +344,13 @@ def changePassword():
     
     return render_template('change_pass.html',form=form)
 
-
+@app.route('/go_back', methods=['POST'])
+def go_back():
+    data = request.json
+    referer = data.get('referer')
+    if referer:
+        return redirect(referer)
+    return redirect(url_for('index'))  
 
 # ----------- アプリ起動 -----------
 
