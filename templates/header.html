@@ -1,3 +1,5 @@
+<html>
+<body>
 <div class="app-header">
     <div class="app-icon">
         <a href="{{ url_for('index') }}" class="icon">
@@ -10,14 +12,6 @@
     </a>
 </div>
 
-<script>
-    if (window.location.pathname.includes("settings")) {
-        const settingActions = document.querySelector(".setting-actions");
-        const settingLink = document.querySelector(".setting-link");
-        if (settingActions && settingLink) {
-            settingActions.style.backgroundColor = "#ae3e89";
-            settingLink.style.color = "#fff";
-        }
-    }
-</script>
-
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
