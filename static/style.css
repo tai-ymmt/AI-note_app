@@ -302,10 +302,10 @@ input::-webkit-clear-button {
     z-index: 10; 
 }
 .note-back-btn { 
-    background: #fff; 
+    background: rgba(255,255,255,0); 
     border: none; 
     color: #857be7; 
-    font-size: 1.1rem; 
+    font-size: 1.2rem; 
     display: flex; 
     align-items: center; 
     gap: .45em; font-weight: 600; 
@@ -357,7 +357,8 @@ input::-webkit-clear-button {
     color: #6c63ff; 
     box-shadow: none; 
     padding: 0.4em; 
-    font-size: 1.2rem; 
+    font-size: 1.2rem;
+    border: none; 
 }
 .btn-ghost:hover { 
     background: #f4f3fd; 
@@ -1021,7 +1022,7 @@ body.dark-mode .note-back-btn {
     color: #ffffff;
 }
 body.dark-mode .note-back-btn:hover {
-    background: #444;
+    background: #333;
     color: #ffffff;
 }
 
