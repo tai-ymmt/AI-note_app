@@ -278,6 +278,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/custom')
+@login_required
 def settings_page():
     return render_template('custom.html')
 
