@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">   
+
+    <title>マイページ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+</html>
+
     <title>ノート一覧</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -27,7 +33,7 @@
             <!-- 検索ボタン -->
             <button type="submit" class="ichiran-search-btn" style="font-size: 1.0em; margin-left: 1%;"><i class="fas fa-search"></i></button>
             <!-- 並び順プルダウン -->
-            <select name="order" class="modal-select" style="margin-left: 2%; font-size: 1.0em; background-color: #fff" onchange="this.form.submit()">
+            <select name="order" class="ichiran-modal-select" style="margin-left: 2%; font-size: 1.0em; background-color: #fff" onchange="this.form.submit()">
                 {% for o in orders %}
                     <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
                 {% endfor %}
@@ -101,14 +107,11 @@
     <div id="toast"></div>
 
     <script>
-    // 新規ノート作成ボタンのクリックイベント（この関数は削除して山本くんのやつに合わせるのがいい）
+    // 新規ノート作成ボタンのクリックイベント（
     document.getElementById('create-note-btn').addEventListener('click', function() {
-      fetch('/note/create', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
+
           // 作成後、そのノートの編集画面へ移動
-          window.location.href = '/note/' + data.note_id;
-        });
+          window.location.href = '/note/new';
     });
 
     // 検索欄の入力クリアボタンの表示制御
