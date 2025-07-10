@@ -278,8 +278,8 @@ body.custom-page {
   left: 40px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;
-  color: #fff;
+  font-size: 36px;
+  color: #000000;
   text-decoration: none;
 }
 
