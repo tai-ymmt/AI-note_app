@@ -6,7 +6,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="login_body">
+<body class="custom-page {{ 'light-mode' if current_user.mode_flag == 1 else 'dark-mode' }}">
+<header>            
+    {% include "header.html" %}
+</header>
+<div class="login_body">
 <div class="login-container">
     <a href="/custom" class="move_custom"><div>←設定に戻る</div></a>
     <h2 class="access_page">パスワード変更</h2>
@@ -68,6 +72,7 @@
         </div>
     </form>
 
+</div>
 </div>
 
 <script src="{{ url_for('static', filename='main.js') }}"></script>

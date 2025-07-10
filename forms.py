@@ -74,8 +74,11 @@ class LoginForm(FlaskForm):
 class ChangePasswordForm(FlaskForm):
     now_password = PasswordField('現在のパスワード', validators=[
         DataRequired(),
-        Length(min=8,max=16)
-    ],
+        Length(min=8,max=16),
+    Regexp(
+            r'^[a-zA-Z0-9]+$',
+            message='使用できない文字が含まれています'
+    )],
     render_kw={"placeholder": "現在のパスワードを入力してください"}
     )
 
