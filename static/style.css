@@ -228,11 +228,20 @@ input::-webkit-clear-button {
     gap: 8px;
     margin-left: auto;
 }
+
+.setting-actions.active {
+  background-color: #6c63ff !important;
+}
+
 /* text-decoration: none; リンクの下線を消したかったら*/
 .setting-link {
 text-decoration: none;
 color: #d6a9ca;
 font-weight: bold;
+}
+
+.setting-link.active {
+  color: #fff !important;
 }
 
 .icon-image {
@@ -241,29 +250,37 @@ font-weight: bold;
 }
 
 /*customページデザイン*/
-body.custum-page {
+body.custom-page {
     margin: 0;
     padding: 0; 
     background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
     color: #222; min-height: 100vh;
     position: relative; 
-}
-
+} 
 
 .custom-title {
-display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
+  position: relative;
+  text-align: center;
+  padding: 20px 40px;
+  height: 60px;
 }
 
-
 .custom-title h1 {
-    margin: 0;
-    font-size: 35px;
-    color: #333;
-    margin-right: 1350px;
+  margin: 0;
+  font-size: 18px;
+  color: #fff; /* ダークモードなら白に */
+  line-height: 60px;
+}
+
+.custom-title .back-link {
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 36px;
+  color: #000000;
+  text-decoration: none;
 }
 
 
@@ -278,7 +295,6 @@ display: flex;
 
 
 main.custom-page {
-    padding: 40px 20px;
     display: flex;
     flex-direction: column;
     gap: 40px;
@@ -330,14 +346,14 @@ select#response-level {
     cursor: pointer;
 }
 
-#logout-btn {
+#custom-logout-btn {
     padding: 12px 24px;
     font-size: 16px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background-color: #d82133;
-    color: white;
+    background-color: #fad1d1;
+    color: #d64242;
 }
 
 #save-setting {
@@ -346,31 +362,12 @@ select#response-level {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background-color: #800080;
+    background-color: #6c63ff;
     color: white;
     margin-left: 700px;
 }
 
-body.dark-mode {
-    background-color: #312e2e;
-    color: rgb(0, 0, 0);
-}
 
-body.dark-mode .app-header {
-    background: #525252;
-}
-
-body.dark-mode section {
-    background-color: #545454;
-}
-
-body.dark-mode h2 {
-    color: #ffffff;
-}
-
-body.dark-mode p {
-    color: #cdcdcd;
-}
 
 .custum-page-form-group {
     margin-bottom: 20px;
@@ -386,4 +383,63 @@ body.dark-mode p {
     width: 200px;
     padding: 6px;
     font-size: 16px;
+}
+
+.custom-modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-modal-box {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.custom-modal-actions {
+  margin-top: 20px;
+}
+
+.custom-modal-actions button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #6c63ff;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.custom-modal-actions button:hover {
+  background-color: #594cf5;
+}
+
+#custom-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #323232;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 9999;
+}
+#custom-toast.show {
+  opacity: 1;
+  visibility: visible;
 }
