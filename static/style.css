@@ -130,7 +130,7 @@ input::-webkit-clear-button {
 
 /* ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ CSS 山本オリジナル  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ */
 .top-bar { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; max-width: 1400px; margin: 2.5rem auto 0 auto; padding: 0 2rem; box-sizing: border-box; position: relative; z-index: 10; }
-.note-back-btn { background: #fff; border: none; color: #857be7; font-size: 1.1rem; display: flex; align-items: center; gap: .45em; font-weight: 600; cursor: pointer; padding: 0.3em 1.3em 0.3em 0.3em; border-radius: 5px; transition: background .14s, color .14s; box-shadow: 0 2px 8px rgba(130,120,250,0.05); }
+.note-back-btn { background: rgba(255,255,255,0); border: none; color: #857be7; font-size: 1.2rem; display: flex; align-items: center; gap: .45em; font-weight: 600; cursor: pointer; padding: 0.3em 1.3em 0.3em 0.3em; border-radius: 5px; transition: background .14s, color .14s; box-shadow: 0 2px 8px rgba(130,120,250,0.05); }
 .note-back-btn:hover { background: #f4f3fd; color: #594cf5; }
 .top-bar-right { display: flex; gap: 0.9em; }
 .btn { display: inline-flex; align-items: center; gap: 0.35em; border: none; border-radius: 6px; padding: 0.55em 1.3em; font-weight: 600; font-size: 1rem; cursor: pointer; background: none; transition: background 0.15s, color 0.15s; box-shadow: 0 1px 4px rgba(108,99,255,0.08); }
