@@ -20,22 +20,23 @@
             {{ form.now_password.label }}<br>
             {{ form.now_password(class="acces_area",id="password",size=16) }}
             <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="password" aria-hidden="true"></i>
-            {% if form.now_password.errors %}
-                <div class="message">
-                    {% for error in form.now_password.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <p class="message">{{ message }}</p>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
         </p>
+        <p>
+                {% with messages = get_flashed_messages(category_filter=['now']) %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p class="message">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% if form.now_password.errors %}
+                    <div class="message">
+                        {% for error in form.now_password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </p>
 
         <p class="form-group password-wrapper">
             {{ form.changed_password.label }}<br>
@@ -46,21 +47,30 @@
             {{ form.changed_confirm.label }}<br>
             {{ form.changed_confirm(class="acces_area",id="changed_confirm",size=16) }}
             <i id="togglePassword" class="fa-solid fa-eye-slash toggle-icon" data-target="changed_confirm" aria-hidden="true"></i>
-            {% if form.changed_password.errors %}
-                <div class='message'>
-                    {% for error in form.changed_password.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% elif form.changed_confirm.errors %}
-                <div class="message">
-                    {% for error in form.changed_confirm.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
         </p>
+ <p>
+                {% with messages = get_flashed_messages(category_filter=['new']) %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p class="message">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
+                {% if form.changed_password.errors %}
+                    <div class='message'>
+                        {% for error in form.changed_password.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% elif form.changed_confirm.errors %}
+                    <div class="message">
+                        {% for error in form.changed_confirm.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </p>        
         <p>{{form.submit(class="access_btn")}}</p>
         <div class="pass_label">
             <h4>パスワード変更に関する注意事項</h4>
