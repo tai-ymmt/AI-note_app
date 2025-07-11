@@ -344,7 +344,16 @@ def changePassword():
     
     return render_template('change_pass.html',form=form)
 
-
+@app.route('/back_with_reload')
+def back_with_reload():
+    referer = request.referrer
+    if referer:
+        # クエリパラメータを付加して戻る（?reload=1）
+        if '?' in referer:
+            return redirect(referer + '&reload=1')
+        else:
+            return redirect(referer + '?reload=1')
+    return redirect('/')
 
 # ----------- アプリ起動 -----------
 
