@@ -13,4 +13,3 @@ with app.app_context():
         print(" demo ユーザーを作成しました。")
     else:
         print(" demo ユーザーはすでに存在します。")
-        
