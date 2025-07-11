@@ -6,5 +6,5 @@ wtforms
 flask-wtf
 google-generativeai
 google-genai
-gunicorn
 
+gunicorn
