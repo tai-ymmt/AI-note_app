@@ -13,67 +13,59 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
+<body class="custom-page {{ 'light-mode' if current_user.mode_flag == 1 else 'dark-mode' }}">
 <!-- 以下、ノート一覧画面 -->
-<body style="margin: 0; padding: 0;">
     <!-- ヘッダー -->
     <header>
         {% include "header.html" %}
     </header>
-    <div style="max-width: 90%; margin: 0 auto; padding: 0 32px; box-sizing: border-box;">
+    <div class="index-body">
         <h1>ノート一覧</h1>
         <!-- 検索フォーム -->
-        <form method="post" style="display: flex; align-items: center; width: 100%; box-sizing: border-box; position: relative;">
-            <!-- 検索入力欄 -->
-            <input type="text" class="ichiran-search-input" id="searchword" name="searchword" placeholder="ノートを検索（タイトル・内容）" value="{{ searchword }}";
-                style="width: 40%; min-width: 150px; max-width: 50%; font-size: 1.2em; padding-right: 2em; background-color: #fff;"
-                oninput="clearbutton()">
-            <!-- 入力クリアボタン -->
-            <button type="button" id="clear-btn" onclick="clearsearch()"
-                style="display: none; position: absolute; right: 56%; top: 50%; transform: translateY(-50%); border: none; background: transparent; font-size: 1.2em; cursor: pointer;">✕</button>
-            <!-- 検索ボタン -->
-            <button type="submit" class="ichiran-search-btn" style="font-size: 1.0em; margin-left: 1%;"><i class="fas fa-search"></i></button>
-            <!-- 並び順プルダウン -->
-            <select name="order" class="ichiran-modal-select" style="margin-left: 2%; font-size: 1.0em; background-color: #fff" onchange="this.form.submit()">
-                {% for o in orders %}
-                    <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
-                {% endfor %}
-            </select>
-            <!-- 右寄せ用スペース -->
-            <span style="flex: 1;"></span>
-            <!-- 新規ノート作成ボタン -->
-            <button type="button" id="create-note-btn" class="btn btn-save" style="font-size: 1.0em; margin-right: 0%;">＋ 新規ノート</button>
+        <form method="post" class="index-form">
+        <div class="search-wrapper">
+            <input type="text" class="ichiran-search-input" id="searchword" name="searchword"
+            placeholder="ノートを検索（タイトル・内容）" value="{{ searchword }}"
+            oninput="clearbutton()">
+            <button type="button" id="clear-btn" onclick="clearsearch()">✕</button>
+        </div>
+
+        <button type="submit" class="ichiran-search-btn"><i class="fas fa-search"></i></button>
+
+        <select name="order" class="ichiran-modal-select" onchange="this.form.submit()">
+            {% for o in orders %}
+            <option value="{{ o }}" {% if o == order %}selected{% endif %}>{{ o }}</option>
+            {% endfor %}
+        </select>
+
+        <span class="flex-spacer"></span>
+
+        <button type="button" id="create-note-btn" class="btn btn-save create-note-btn">＋ 新規ノート</button>
         </form>
         <!-- ノート件数表示 -->
-        <p style="margin: 8px 0 0 0;">
-            {{ len }}件のノート
-        </p>
+        <p class="note-count">{{ len }}件のノート</p>
         {% if len>0 %}
         <!-- ノート一覧テーブル -->
-        <table class="hyou-section" style="border: none; margin-top: 24px; width: 100%; border-collapse: collapse;" cellpadding="8" cellspacing="0">
-           <thead>
+            <table class="hyou-section" cellpadding="8" cellspacing="0">
+            <thead>
                 <tr>
-                    <!-- タイトル列 -->
-                    <th style="text-align: left; padding-left: 5%; width: 45ch;">タイトル</th>
-                    <!-- 最終更新日列 -->
-                    <th style="text-align: left;">最終更新日</th>
-                    <!-- 操作列 -->
-                    <th style="width: 15%;"></th>
+                    <th class="th-title">タイトル</th>
+                    <th class="th-updated">最終更新日</th>
+                    <th class="th-blank"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for note in notes: %}
-                <tr id="hyou" onclick="location.href='/note/{{ note.num }}'">
-                    <!-- ノートタイトル -->
-                    <td style="text-align: left; padding-left: 5%; width: 45ch;">{{ note.title }}</td>
-                    <!-- 最終更新日　xxxx年xx月xx日 -->
-                    <td style="text-align: left;">{{ note.update_time.strftime('%Y年%m月%d日') }}</td>
-                    <!-- ノート一覧テーブル内の削除ボタン -->
-                    <td style="text-align: left; width: 1%;">
-                        <button type="button"
-                            onclick="event.stopPropagation(); confirmDeleteCustom('{{ note.num }}', '{{ note.title|e }}')"
-                            class="btn btn-delete" style="font-size: 1.0em;"><i class="fas fa-trash-alt"></i></button>
-                    </td>
-                </tr>
+                    <tr id="hyou" onclick="location.href='/note/{{ note.num }}'">
+                        <td class="td-title">{{ note.title }}</td>
+                        <td class="td-updated">{{ note.update_time.strftime('%Y年%m月%d日') }}</td>
+                        <td class="td-delete">
+                            <button type="button" onclick="event.stopPropagation(); confirmDeleteCustom('{{ note.num }}', '{{ note.title|e }}')" class="btn btn-delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -81,7 +73,7 @@
         {% endif %}
         <!-- ノートがない場合のメッセージ -->
         {% if len==0 %}
-            <p style="text-align: center; color: #999; margin-top: 24px;">ノートがありません</p>
+            <p class="no-notes">ノートがありません</p>
         {% endif %}
     </div>
 
@@ -89,11 +81,12 @@
         <div id="remove-confirm-modal" class="modal-outer">
         <div class="modal-inner">
         <div class="modal-header">
-            <span class="modal-title" style="color: #d64242;"><i class="fas fa-exclamation-triangle"></i> ノートを削除</span>
+            <span class="modal-title modal-title-danger"><i class="fas fa-exclamation-triangle"></i> ノートを削除</span>
         </div>
         <div class="modal-body">
-            <p style="margin: 1em 0 2em; line-height: 1.6;">
-            本当に「<span id="modal-note-title"></span>」を削除しますか？<br>この操作は元に戻すことはできません。
+            <p class="modal-delete-message">
+                本当に「<span id="modal-note-title"></span>」を削除しますか？<br>
+                この操作は元に戻すことはできません。
             </p>
         </div>
         <div class="modal-actions">

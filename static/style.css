@@ -9,8 +9,9 @@ body {
     position: relative; 
 }
 
+
 /*ユーザー情報入力ページデザイン*/
-body.login_body {
+.login_body {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -77,9 +78,9 @@ body.login_body {
 /* アイコンの位置 */
 .toggle-icon {
   position: absolute;
-  top: 70%;
-  right: 0;
-  transform: translateY(-125%);
+  top: 50%;
+  right: 10px;
+  transform: translateY(-25%);
   cursor: pointer;
   color: #888;
 }
@@ -115,62 +116,441 @@ input::-webkit-clear-button {
 
 /* ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ CSS 本田オリジナル ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ */
 /* ノート一覧用CSS */
+.index-form {
+    display: flex; 
+    align-items: center; 
+    width: 100%; 
+    box-sizing: border-box; 
+    position: relative;
+}
+.index-body {
+    max-width: 90%; 
+    margin: 0 auto; 
+    padding: 0 32px; 
+    box-sizing: border-box;
+}
+/* 検索フォーム */
+/* .ichiran-search-input {
+    width: 40%;
+    min-width: 150px;
+    max-width: 50%;
+    font-size: 1.2em;
+    padding-right: 2em;
+    background-color: #fff;
+} */
+.ichiran-search-input {
+  width: 100%;
+  font-size: 1.1em;
+  padding: 0.6em 2.2em 0.6em 1em; /* 右に余白（✕用） */
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  box-sizing: border-box;
+}
+.search-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 50%;
+}
+.flex-spacer {
+  flex: 1;
+}
+#clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 1.2em;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.create-note-btn {
+  font-size: 1em;
+  margin-right: 0;
+}
+.ichiran-search-btn {
+    font-size: 1.0em;
+    margin-left: 1%;
+}
+
+.ichiran-modal-select {
+    margin-left: 2%;
+    font-size: 1.0em;
+    background-color: #fff;
+}
+
+/* ノート件数表示 */
+.note-count {
+    margin: 8px 0 0 0;
+}
+
+/* テーブル設定 */
+/* .hyou-section {
+    border: none;
+    margin-top: 24px;
+    width: 100%;
+    border-collapse: collapse;
+} */
+.hyou-section {
+    flex: 1 1 0;
+    border: none;
+    margin-top: 24px;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff; 
+    border-radius: 18px; 
+    box-shadow: 0 4px 24px rgba(120,120,180,0.09); 
+    padding: 2.5rem 2.5rem 2.3rem 2.5rem; 
+    min-width: 0; 
+}
+
+/* テーブル見出し */
+.th-title {
+    text-align: left;
+    padding-left: 5%;
+    width: 45ch;
+}
+
+.th-updated {
+    text-align: left;
+}
+
+.th-blank {
+    width: 15%;
+}
+
+/* テーブルのデータセル */
+.td-title {
+    text-align: left;
+    padding-left: 5%;
+    width: 45ch;
+}
+
+.td-updated {
+    text-align: left;
+}
+
+.td-delete {
+    text-align: left;
+    width: 1%;
+}
+
+/* ノートなしのときのメッセージ */
+.no-notes {
+    text-align: center;
+    color: #999;
+    margin-top: 24px;
+}
+
+/* モーダルタイトル色 */
+.modal-title-danger {
+    color: #d64242;
+}
+.modal-delete-message {
+  margin: 1em 0 2em;
+  line-height: 1.6;
+}
+
 #hyou:hover {
     background-color: #edf1fe;
     cursor: pointer;
 }
-.hyou-section { flex: 1 1 0; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(120,120,180,0.09); padding: 2.5rem 2.5rem 2.3rem 2.5rem; min-width: 0; }
-.ichiran-search-btn { background: #6c63ff; color: #fff; border: none; padding: 0.7em 1em; border-radius: 7px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-.ichiran-search-btn:hover { background: #594cf5; }
-.ichiran-search-input-wrapper { display: flex; gap: 0.4rem; margin-bottom: 0.7rem; }
-.ichiran-search-input { font-size: 1em; padding: 0.5em 1em; border-radius: 7px; border: 1px solid #eceafd; background: #fff; outline: none; transition: border 0.18s; }
-.ichiran-search-input:focus { border: 1.5px solid #6c63ff; }
-.ichiran-modal-select { padding: 0.7em 0.7em; border-radius: 7px; border: 1px solid #eceafd;}
+
+.ichiran-search-btn { 
+    background: #6c63ff; 
+    color: #fff; 
+    border: none; 
+    padding: 0.7em 1em; 
+    border-radius: 7px; font-weight: 600; 
+    cursor: pointer; 
+    transition: background 0.2s; 
+}
+.ichiran-search-btn:hover { 
+    background: #594cf5; 
+}
+.ichiran-search-input-wrapper {
+     display: flex; 
+     gap: 0.4rem; 
+     margin-bottom: 0.7rem; 
+}
+
+.ichiran-search-input:focus { 
+    border: 1.5px solid #6c63ff; 
+}
+.ichiran-modal-select { 
+    padding: 0.7em 0.7em; 
+    border-radius: 7px; 
+    border: 1px solid #eceafd;
+}
 /* ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ CSS 本田オリジナル ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ */
 
 /* ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ CSS 山本オリジナル  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ */
-.top-bar { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; max-width: 1400px; margin: 2.5rem auto 0 auto; padding: 0 2rem; box-sizing: border-box; position: relative; z-index: 10; }
-.note-back-btn { background: #fff; border: none; color: #857be7; font-size: 1.1rem; display: flex; align-items: center; gap: .45em; font-weight: 600; cursor: pointer; padding: 0.3em 1.3em 0.3em 0.3em; border-radius: 5px; transition: background .14s, color .14s; box-shadow: 0 2px 8px rgba(130,120,250,0.05); }
-.note-back-btn:hover { background: #f4f3fd; color: #594cf5; }
-.top-bar-right { display: flex; gap: 0.9em; }
-.btn { display: inline-flex; align-items: center; gap: 0.35em; border: none; border-radius: 6px; padding: 0.55em 1.3em; font-weight: 600; font-size: 1rem; cursor: pointer; background: none; transition: background 0.15s, color 0.15s; box-shadow: 0 1px 4px rgba(108,99,255,0.08); }
-.btn-save { background: #6c63ff; color: #fff; }
-.btn-save:hover { background: #594cf5; }
-.btn-delete { background: #fff1f1; color: #d64242; border: 1px solid #fad1d1; }
-.btn-delete:hover { background: #ffd6d6; color: #ab1d1d; }
-.btn-ghost { background: none; color: #6c63ff; box-shadow: none; padding: 0.4em; font-size: 1.2rem; }
-.btn-ghost:hover { background: #f4f3fd; color: #594cf5; }
-.main-content { display: flex; flex-direction: row;gap: 2.4rem; max-width: 1400px; margin: 1.5rem auto 0 auto; padding: 0 2rem 2rem 2rem; min-height: 80vh; align-items: flex-start; }
-.editor-section { flex: 1 1 0; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(120,120,180,0.09); padding: 2.5rem 2.5rem 2.3rem 2.5rem; display: flex; flex-direction: column; min-width: 0; }
-.note-title-bar { border-bottom: 2px solid #eceafd; margin-bottom: 1.3em; padding-bottom: 0.7em; }
-.note-title-input { font-size: 2.1rem; font-weight: 700; border: none; background: transparent; outline: none; color: #222243; width: 100%; letter-spacing: 0.02em; }
-.note-title-input::placeholder { color: #b6b8d1; font-weight: 400; font-size: 1.2rem; }
-.editor-toolbar { display: flex; gap: 8px; background: #f8f8fe; border-radius: 8px; padding: 0.5rem 0.7rem; margin-bottom: 1.4rem; border: 1px solid #eceafd; flex-wrap: wrap; }
-.toolbar-btn { background: none; border: none; color: #2a2847; font-size: 1.13em; padding: 0.22em 0.55em; border-radius: 4px; cursor: pointer; transition: background 0.14s, color 0.14s; }
-.toolbar-btn:hover { background: #6c63ff; color: #fff; }
+.top-bar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start; width: 100%; 
+    max-width: 1400px; 
+    margin: 2.5rem auto 0 auto; 
+    padding: 0 2rem; 
+    box-sizing: border-box; 
+    position: relative; 
+    z-index: 10; 
+}
+.note-back-btn { 
+    background: rgba(255,255,255,0); 
+    border: none; 
+    color: #857be7; 
+    font-size: 1.2rem; 
+    display: flex; 
+    align-items: center; 
+    gap: .45em; font-weight: 600; 
+    cursor: pointer; 
+    padding: 0.3em 1.3em 0.3em 0.3em; 
+    border-radius: 5px; 
+    transition: background .14s, color .14s; 
+    box-shadow: 0 2px 8px rgba(130,120,250,0.05); 
+}
+.note-back-btn:hover { 
+    background: #f4f3fd; 
+    color: #594cf5; 
+}
+.top-bar-right { 
+    display: flex; 
+    gap: 0.9em; 
+}
+.btn { 
+    display: inline-flex;
+    align-items: center; 
+    gap: 0.35em; border: none; 
+    border-radius: 6px; 
+    padding: 0.55em 1.3em; 
+    font-weight: 600; 
+    font-size: 1rem; 
+    cursor: pointer; 
+    background: none; 
+    transition: background 0.15s, color 0.15s; 
+    box-shadow: 0 1px 4px rgba(108,99,255,0.08); 
+}
+.btn-save { 
+    background: #6c63ff; 
+    color: #fff; 
+}
+.btn-save:hover { 
+    background: #594cf5; 
+}
+.btn-delete { 
+    background: #fff1f1; 
+    color: #d64242; 
+    border: 1px solid #fad1d1; 
+}
+.btn-delete:hover { 
+    background: #ffd6d6; 
+    color: #ab1d1d; 
+}
+.btn-ghost { 
+    background: none; 
+    color: #6c63ff; 
+    box-shadow: none; 
+    padding: 0.4em; 
+    font-size: 1.2rem;
+    border: none; 
+}
+.btn-ghost:hover { 
+    background: #f4f3fd; 
+    color: #594cf5; 
+}
+.main-content { 
+    display: flex; 
+    flex-direction: row;
+    gap: 2.4rem; 
+    max-width: 1400px; 
+    margin: 1.5rem auto 0 auto; 
+    padding: 0 2rem 2rem 2rem; 
+    min-height: 80vh; 
+    align-items: flex-start; 
+}
+.editor-section { 
+    flex: 1 1 0; 
+    background: #fff; 
+    border-radius: 18px; 
+    box-shadow: 0 4px 24px rgba(120,120,180,0.09); 
+    padding: 2.5rem 2.5rem 2.3rem 2.5rem; 
+    display: flex; 
+    flex-direction: column; 
+    min-width: 0;
+}
+.note-title-bar { border-bottom: 2px solid #eceafd;
+    margin-bottom: 1.3em; 
+    padding-bottom: 0.7em; 
+}
+.note-title-input { 
+    font-size: 2.1rem; 
+    font-weight: 700; 
+    border: none; 
+    background: transparent; 
+    outline: none; 
+    color: #222243; 
+    width: 100%; 
+    letter-spacing: 0.02em; 
+}
+.note-title-input::placeholder { color: #b6b8d1; 
+    font-weight: 400; 
+    font-size: 1.2rem; 
+}
+.editor-toolbar { 
+    display: flex; 
+    gap: 8px; 
+    background: #f8f8fe; 
+    border-radius: 8px; 
+    padding: 0.5rem 0.7rem; 
+    margin-bottom: 1.4rem; 
+    border: 1px solid #eceafd; 
+    flex-wrap: wrap; 
+}
+.toolbar-btn { 
+    background: none; 
+    border: none; 
+    color: #2a2847; 
+    font-size: 1.13em; 
+    padding: 0.22em 0.55em; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    transition: background 0.14s, color 0.14s; 
+}
+.toolbar-btn:hover { 
+    background: #6c63ff; 
+    color: #fff; 
+}
 .toolbar-btn.active {
   border: 2px solid #6c63ff;
   background: #eceafd;
   color: #6c63ff;
   box-shadow: 0 2px 8px rgba(108,99,255,0.09);
 }
-.toolbar-separator { border-left: 1px solid #eceafd; height: 20px; margin: auto 7px; }
-.rich-editor { min-height: 320px; max-height: 540px; outline: none; border: none; font-size: 1.17em; padding: 1.1rem 0 0.5rem 0; line-height: 1.7; color: #222243; background: none; resize: vertical; overflow: auto; }
-.rich-editor:empty::before { content: attr(data-placeholder); color: #b9b8d5; font-size: 1em; font-style: italic; pointer-events: none; }
-.ai-sidebar { width: 340px; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(120,120,180,0.13); padding: 2rem 1.6rem; display: flex; flex-direction: column; gap: 1.4rem; min-width: 270px; align-self: flex-start; }
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
-.sidebar-title { font-size: 1.18rem; font-weight: 700; color: #594cf5; display: flex; align-items: center; gap: 0.55em; }
-.ai-search-section { margin-bottom: 0.7rem; }
-.search-input-wrapper { display: flex; gap: 0.4rem; margin-bottom: 0.7rem; }
-.search-input { flex: 1 1 0; font-size: 1em; padding: 0.55em 1em; border-radius: 7px; border: 1px solid #eceafd; background: #f6f7fb; outline: none; transition: border 0.18s; }
-.search-input:focus { border: 1.5px solid #6c63ff; }
-.search-btn { background: #6c63ff; color: #fff; border: none; padding: 0.45em 1em; border-radius: 7px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-.search-btn:hover { background: #594cf5; }
-.ai-results { background: #f8f8fe; border-radius: 8px; padding: 1.1rem; min-height: 130px; color: #656579; font-size: 0.99em; }
-.welcome-message { display: flex; flex-direction: column; align-items: center; color: #888; text-align: center; }
-.welcome-icon { font-size: 1.5em; margin-bottom: 0.6em; color: #6c63ff; }
-.welcome-features { display: flex; gap: 1.15em; margin-top: 0.9em; flex-wrap: wrap; justify-content: center; }
-.feature-item { display: flex; align-items: center; gap: 0.35em; color: #bbb; font-size: 0.98em; }
+.toolbar-separator { 
+    border-left: 1px solid #eceafd; 
+    height: 20px; 
+    margin: auto 7px; 
+}
+.rich-editor { 
+    min-height: 320px; 
+    max-height: 540px; 
+    outline: none; 
+    border: none; 
+    font-size: 1.17em; 
+    padding: 1.1rem 0 0.5rem 0; 
+    line-height: 1.7; 
+    color: #222243; 
+    background: none; 
+    resize: vertical; 
+    overflow: auto; 
+}
+.rich-editor:empty::before { 
+    content: attr(data-placeholder); 
+    color: #b9b8d5; 
+    font-size: 1em; 
+    font-style: italic; 
+    pointer-events: none; 
+}
+.ai-sidebar { 
+    width: 340px; 
+    background: #fff; 
+    border-radius: 18px; 
+    box-shadow: 0 4px 24px rgba(120,120,180,0.13); 
+    padding: 2rem 1.6rem; display: flex; 
+    flex-direction: column; 
+    gap: 1.4rem; 
+    min-width: 270px; 
+    align-self: flex-start; 
+}
+.sidebar-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 0.7rem;
+}
+.sidebar-title { 
+    font-size: 1.18rem; 
+    font-weight: 700; 
+    color: #594cf5; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.55em; 
+}
+.ai-search-section { 
+    margin-bottom: 0.7rem;
+}
+.search-input-wrapper { 
+    display: flex; 
+    gap: 0.4rem; 
+    margin-bottom: 0.7rem; 
+}
+.search-input { 
+    flex: 1 1 0; 
+    font-size: 1em; 
+    padding: 0.55em 1em; 
+    border-radius: 7px; 
+    border: 1px solid #eceafd; 
+    background: #f6f7fb; 
+    outline: none; 
+    transition: border 0.18s;
+}
+.search-input:focus { 
+    border: 1.5px solid #6c63ff; 
+}
+.search-btn { 
+    background: #6c63ff; 
+    color: #fff; 
+    border: none; 
+    padding: 0.45em 1em; 
+    border-radius: 7px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: background 0.2s; 
+}
+.search-btn:hover { 
+    background: #594cf5;
+}
+.ai-results { 
+    background: #f8f8fe; 
+    border-radius: 8px; 
+    padding: 1.1rem; 
+    min-height: 130px; 
+    color: #656579; 
+    font-size: 0.99em;
+}
+.welcome-message { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    color: #888; 
+    text-align: center; 
+}
+.welcome-icon {
+    font-size: 1.5em; 
+    margin-bottom: 0.6em; 
+    color: #6c63ff; 
+}
+.welcome-features { 
+    display: flex; 
+    gap: 1.15em; 
+    margin-top: 0.9em; 
+    flex-wrap: wrap; 
+    justify-content: 
+    center; 
+}
+.feature-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.35em; 
+    color: #bbb; 
+    font-size: 0.98em; 
+}
 #toast {
   position: fixed; right: 32px; bottom: 32px;
   min-width: 180px;
@@ -194,16 +574,68 @@ input::-webkit-clear-button {
   pointer-events: auto;
   transition: opacity 0.4s;
 }
-.modal-outer { display: none; position: fixed; left:0; top:0; width:100vw; height:100vh; background: rgba(40,30,55,0.17); z-index:99999; align-items: center; justify-content: center; }
-.modal-outer.is-visible { display: flex; }
-.modal-inner { background:#fff; border-radius:15px; min-width:320px; max-width:96vw; box-shadow:0 6px 28px rgba(80,60,130,0.12); padding:2.1em 2em 1.3em 2em; margin:auto; position:relative; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3em; }
-.modal-title { font-size: 1.22rem; font-weight: 700; }
-.modal-form-group { margin-bottom: 1.1em; }
-.modal-label { font-weight: 600; color: #594cf5; display: block; margin-bottom: 0.3em; }
-.modal-select, .modal-textarea { width: 100%; box-sizing: border-box; font-size: 1em; padding: 0.5em 0.7em; border-radius: 7px; border: 1px solid #eceafd; background: #f8f8fe; }
-.modal-textarea { resize: vertical; }
-.modal-actions { display: flex; justify-content: flex-end; gap: 1em; margin-top: 2em; }
+.modal-outer { 
+    display: none; 
+    position: fixed; 
+    left:0; 
+    top:0; 
+    width:100vw; 
+    height:100vh; 
+    background: rgba(40,30,55,0.17); 
+    z-index:99999; 
+    align-items: center; 
+    justify-content: center; 
+}
+.modal-outer.is-visible { 
+    display: flex; 
+}
+.modal-inner { 
+    background:#fff; 
+    border-radius:15px; 
+    min-width:320px; 
+    max-width:96vw; 
+    box-shadow:0 6px 28px rgba(80,60,130,0.12); 
+    padding:2.1em 2em 1.3em 2em; 
+    margin:auto; 
+    position:relative; 
+}
+.modal-header { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 1.3em; 
+}
+.modal-title { 
+    font-size: 1.22rem; 
+    font-weight: 700; 
+}
+.modal-form-group { 
+    margin-bottom: 1.1em; 
+}
+.modal-label { 
+    font-weight: 600; 
+    color: #594cf5; 
+    display: block; 
+    margin-bottom: 0.3em; 
+}
+.modal-select, .modal-textarea {
+    width: 100%; 
+    box-sizing: border-box; 
+    font-size: 1em; 
+    padding: 0.5em 0.7em; 
+    border-radius: 7px; 
+    border: 1px solid #eceafd; 
+    background: #f8f8fe; 
+}
+.modal-textarea { 
+    resize: vertical; 
+}
+.modal-actions { 
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 1em; 
+    margin-top: 2em; 
+}
 /* ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ CSS　山本オリジナル ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ */
 
 /* headerページデザイン*/
@@ -219,20 +651,31 @@ input::-webkit-clear-button {
 }
 
 .setting-actions {
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
     padding: 8px 12px;
-    background-color: #f0f0f0;
+    background: #6c63ff; 
+    color: #fff; 
     border-radius: 12px;
     border: 1px solid #ccc;
     gap: 8px;
     margin-left: auto;
 }
+
+.setting-actions.active {
+  background-color: #6c63ff !important;
+}
+
 /* text-decoration: none; リンクの下線を消したかったら*/
 .setting-link {
 text-decoration: none;
-color: #d6a9ca;
+color: #fff;
 font-weight: bold;
+}
+
+.setting-link.active {
+  color: #fff !important;
 }
 
 .icon-image {
@@ -240,30 +683,39 @@ font-weight: bold;
     height: auto; /* 縦横比を保つ */
 }
 
+
 /*customページデザイン*/
-body.custum-page {
+body.custom-page {
     margin: 0;
     padding: 0; 
     background: linear-gradient(120deg, #f7f8fc 60%, #e4eaff 100%);
     font-family: 'Inter', 'Noto Sans JP', sans-serif;
     color: #222; min-height: 100vh;
     position: relative; 
-}
-
+} 
 
 .custom-title {
-display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
+  position: relative;
+  text-align: center;
+  padding: 20px 40px;
+  height: 60px;
 }
 
-
 .custom-title h1 {
-    margin: 0;
-    font-size: 35px;
-    color: #333;
-    margin-right: 1350px;
+  margin: 0;
+  font-size: 18px;
+  color: #fff; /* ダークモードなら白に */
+  line-height: 60px;
+}
+
+.custom-title .back-link {
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 36px;
+  color: #000000;
+  text-decoration: none;
 }
 
 
@@ -278,7 +730,6 @@ display: flex;
 
 
 main.custom-page {
-    padding: 40px 20px;
     display: flex;
     flex-direction: column;
     gap: 40px;
@@ -330,14 +781,14 @@ select#response-level {
     cursor: pointer;
 }
 
-#logout-btn {
+#custom-logout-btn {
     padding: 12px 24px;
     font-size: 16px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background-color: #d82133;
-    color: white;
+    background-color: #fad1d1;
+    color: #d64242;
 }
 
 #save-setting {
@@ -346,31 +797,12 @@ select#response-level {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    background-color: #800080;
+    background-color: #6c63ff;
     color: white;
     margin-left: 700px;
 }
 
-body.dark-mode {
-    background-color: #312e2e;
-    color: rgb(0, 0, 0);
-}
 
-body.dark-mode .app-header {
-    background: #525252;
-}
-
-body.dark-mode section {
-    background-color: #545454;
-}
-
-body.dark-mode h2 {
-    color: #ffffff;
-}
-
-body.dark-mode p {
-    color: #cdcdcd;
-}
 
 .custum-page-form-group {
     margin-bottom: 20px;
@@ -386,4 +818,221 @@ body.dark-mode p {
     width: 200px;
     padding: 6px;
     font-size: 16px;
+}
+
+.custom-modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-modal-box {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.custom-modal-actions {
+  margin-top: 20px;
+}
+
+#custom-confirm-logout {
+  background-color: #e53935;  /* 背景色：赤 */
+  color: white;               /* 文字色：白 */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#custom-confirm-logout:hover {
+  background-color: #c62828;
+}
+
+#custom-cancel-logout {
+  background-color: #6c63ff;  /* 背景色：グレー */
+  color: white;               
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#custom-cancel-logout:hover {
+  background-color: #6058fb;
+}
+
+#custom-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #323232;
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 9999;
+}
+#custom-toast.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+/*以下ダークモード設定*/
+/* ダークモード切り替え用 - 共通 */
+body.dark-mode,
+body.dark-mode .custom-body {
+    background: linear-gradient(120deg, #1a1a1a 60%, #2c2c2c 100%);
+    color: #f0f0f0;
+}
+
+body.dark-mode .index-body,
+body.dark-mode .editor-section,
+body.dark-mode .ai-sidebar,
+body.dark-mode .modal-inner,
+body.dark-mode section,
+body.dark-mode .login-container {
+    background: #2a2a2a;
+    color: #f0f0f0;
+}
+
+body.dark-mode .pass_label,
+body.dark-mode .ai-results,
+body.dark-mode .editor-toolbar,
+body.dark-mode .pathward-chenge-link {
+    background: #4f4f4f;
+    color: #f0f0f0;
+}
+
+body.dark-mode .move_custom,
+body.dark-mode .fas,
+body.dark-mode .sidebar-title,
+body.dark-mode .rich-editor,
+body.dark-mode .custom-title h1,
+body.dark-mode .back-link,
+body.dark-mode .custom-page {
+    color: #f0f0f0;
+}
+/* 入力欄・検索欄・セレクトボックス */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+    border: 1px solid #555;
+}
+
+body.dark-mode .ichiran-search-input,
+body.dark-mode .search-input {
+    background: #333;
+    border-color: #666;
+}
+
+/* トースト通知 */
+body.dark-mode #toast {
+    background: rgba(240,240,240,0.95);
+    color: #1a1a1a;
+}
+
+/* ボタンスタイル */
+body.dark-mode .btn-save,
+body.dark-mode .ichiran-search-btn,
+body.dark-mode .search-btn,
+body.dark-mode .btn-ghost,
+body.dark-mode #save-setting,
+body.dark-mode #custom-cancel-logout {
+    background: #262348;
+    color: #9c88d3;
+}
+body.dark-mode .btn-save:hover {
+    background: #807ad0;
+}
+body.dark-mode .btn-delete,
+body.dark-mode #logout-btn,
+body.dark-mode #custom-confirm-logout,
+body.dark-mode #custom-logout-btn {
+    background: #4d2c2c;
+    color: #f0b0b0;
+    border-color: #7f3f3f;
+}
+body.dark-mode .btn-delete:hover {
+    background: #7a3a3a;
+    color: #fff;
+}
+body.dark-mode .btn-ghost {
+    color: #a7a5ff;
+}
+body.dark-mode .btn-ghost:hover {
+    background: #3d3b66;
+}
+
+/* テーブル */
+body.dark-mode .hyou-section {
+    background: #262626;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+body.dark-mode #hyou:hover {
+    background-color: #3a3a3a;
+}
+
+/* モーダル */
+body.dark-mode .modal-outer {
+    background: rgba(0, 0, 0, 0.6);
+}
+body.dark-mode .modal-inner {
+    background: #2a2a2a;
+    box-shadow: 0 6px 28px rgba(0,0,0,0.4);
+}
+body.dark-mode .modal-title {
+    color: #ff6f6f;
+}
+body.dark-mode .modal-textarea,
+body.dark-mode .modal-select,
+body.dark-mode .custom-modal-box {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+/* ヘッダー・リンクなど */
+body.dark-mode .app-header {
+    background-color: #222;
+}
+body.dark-mode .setting-actions {
+    background-color: #333;
+    border-color: #555;
+}
+body.dark-mode .setting-link {
+    color: #9c88d3;
+}
+body.dark-mode .note-back-btn {
+    background: #333;
+    color: #ffffff;
+}
+body.dark-mode .note-back-btn:hover {
+    background: #444;
+    color: #ffffff;
+}
+
+/* テキストプレースホルダーなど */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #aaa;
+}
+
+/* ノートなしメッセージ */
+body.dark-mode .no-notes {
+    color: #aaa;
 }
