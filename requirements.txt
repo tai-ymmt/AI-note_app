@@ -4,10 +4,6 @@ Flask-SQLAlchemy
 mysqlclient
 wtforms
 flask-wtf
-
-<<<<<<< HEAD
-=======
-#AI関連
->>>>>>> 8a452f31e98f7890695ad1162e4df22c7c1469d8
 google-generativeai
 google-genai
+gunicorn
